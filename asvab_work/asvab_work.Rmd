@@ -48,7 +48,7 @@ asvab_clean <- asvab_data %>%
 
 ##summarizing the data 
   
-  ##race distribution 
+  ### race distribution 
 
 ```{r}
 race_counts <- asvab_clean |> 
@@ -58,7 +58,7 @@ race_counts <- asvab_clean |>
 print(race_counts)
 ```
 
- ##gender distribution 
+ ### gender distribution 
 ```{r}
 gender_count <- asvab_clean |> 
   count(sex, sort = TRUE) |> 
@@ -67,14 +67,14 @@ gender_count <- asvab_clean |>
 ```
 
 
- ##age distribution 
+  ### age distribution 
   
 ```{r}
 age_count <- asvab_clean |> 
   count(age, sort=TRUE) |> 
   print()
 ```
-##producing age ranges 
+  ### producing age ranges 
 ```{r}
 asvab_clean <- asvab_clean %>%
   mutate(age_range = cut(
@@ -90,7 +90,27 @@ asvab_clean <- asvab_clean %>%
 
 ## age range 
 ```{r}
-asvab_clean %>%
+asvab_clean |> 
   count(age_range)
+```
+
+### Latest Schooling By Race 
+```{r}
+latest_schooling_by_race <- asvab_clean |> 
+  group_by(race, latest_school_type) |> 
+  summarise(count = n(), .groups = "drop")
+
+print(latest_schooling_by_race)
+```
+
+### Latest Schooling By Gender 
+
+```{r}
+latest_schooling_by_gender <- asvab_clean |> 
+    group_by(race, latest_school_type) |> 
+  summarise(count = n(), .groups = "drop")
+
+print(latest_schooling_by_gender)
+  
 ```
 
