@@ -1,0 +1,96 @@
+---
+title: "asvab_work"
+author: "Tiasia Saunders"
+date: "2025-04-25"
+output:
+  html_document: default
+  pdf_document: default
+---
+## load libraries    
+```{r}
+library(tidyverse)
+library(readxl)
+library(rio)
+library(janitor)
+
+```
+
+## loading data 
+```{r}
+asvab_data <- read_excel("asvab_data_2020-2024.xlsx")
+```
+
+
+## clean heading names 
+```{r}
+asvab_data <- asvab_data|> 
+  clean_names()
+```
+
+## clean data 
+
+```{r}
+asvab_clean <- asvab_data %>%
+  # Remove rows with all NA values (optional)
+  filter(if_any(everything(), ~ !is.na(.))) %>%
+  
+  # Trim whitespace from character columns
+  mutate(across(where(is.character), str_trim)) %>%
+  
+  # Convert empty strings to NA
+  mutate(across(where(is.character), ~ na_if(., ""))) %>%
+  
+  # Handle known inconsistent values (e.g., "N/A", "NA", "Unknown")
+  mutate(across(where(is.character), ~ na_if(., "N/A"))) %>%
+  mutate(across(where(is.character), ~ na_if(., "Unknown"))) 
+  
+```
+
+##summarizing the data 
+  
+  ##race distribution 
+
+```{r}
+race_counts <- asvab_clean |> 
+  separate_rows(race, sep = ",\\s*") |>   # splits by comma and optional space
+  count(race, sort = TRUE) 
+
+print(race_counts)
+```
+
+ ##gender distribution 
+```{r}
+gender_count <- asvab_clean |> 
+  count(sex, sort = TRUE) |> 
+  print()
+
+```
+
+
+ ##age distribution 
+  
+```{r}
+age_count <- asvab_clean |> 
+  count(age, sort=TRUE) |> 
+  print()
+```
+##producing age ranges 
+```{r}
+asvab_clean <- asvab_clean %>%
+  mutate(age_range = cut(
+    age,
+    breaks = c(17, 24, 34, 44, 54, 64, Inf),  # customize as needed
+    labels = c("16–24", "25–34", "35–44", "45–54", "55–64", "65+"),
+    right = TRUE,   # include the upper bound (e.g., 24 is part of 18–24)
+    include.lowest = TRUE
+  ))
+
+
+```
+
+## age range 
+```{r}
+asvab_clean %>%
+  count(age_range)
+```
+
