@@ -13,6 +13,7 @@ library(readxl)
 library(rio)
 library(janitor)
 library(ggplot2)
+library(scales)
 
 ```
 
@@ -70,6 +71,19 @@ gender_count <- asvab_clean |>
 
 ```
 
+ ### Graphic of gender distribution 
+```{r}
+ggplot(gender_count, aes(x = sex, y = n, fill = sex)) +
+  geom_col() +
+  scale_fill_manual(values = c("Male" = "#3182bd", "Female" = "#e6550d")) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(title = "ASVAB Gender Distribution",
+       x = "Gender",
+       y = "Count") +
+  theme_minimal()
+
+```
+-- there are 332,846 males and 156518	females
 
   ### age distribution 
   
@@ -98,28 +112,52 @@ asvab_clean |>
   count(age_range)
 ```
 
-### Latest Schooling By Race 
 ```{r}
-latest_schooling_by_race <- asvab_clean |> 
-  group_by(race, latest_school_type) |> 
-  summarise(count = n(), .groups = "drop")
+asvab_clean$age_range <- factor(asvab_clean$age_range,
+                                levels = c("16–24", "25–34", "35–44", "45–54", "55–64", "65+", "NA"))
 
-print(latest_schooling_by_race)
-```
-
-```{r}
-ggplot(latest_schooling_by_race, aes(x = race, y = count)) +
-  geom_col(fill = "#2c7fb8") +
-  facet_wrap(~ latest_school_type, scales = "free_y") +  # each school type gets its own plot
-  labs(title = "Race Count per School Type",
-       x = "Race",
+# Plot
+ggplot(asvab_clean, aes(x = age_range)) +
+  geom_bar(fill = "lavender") +
+  scale_y_continuous(labels = scales::label_comma()) +
+  scale_x_discrete(drop = FALSE) +  # Prevent ggplot from dropping unused levels
+  labs(title = "Age Range Distribution",
+       x = "Age Range",
        y = "Count") +
   theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, size = 7),
-    strip.text = element_text(size = 10),
-    plot.title = element_text(face = "bold", hjust = 0.5)
-  )
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+-- So mostly 16-24 year olds take the ASVAB test 
+
+
+
+### Latest Schooling By Race 
+```{r}
+
+# Separate multiracial combinations into individual rows
+latest_schooling_by_race <- asvab_clean %>%
+  separate_rows(race, sep = ",\\s*") %>%  # Split "A, B" into separate rows
+  group_by(race, latest_school_type) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count))
+
+```
+
+### Graph of Latest Schooling By Race 
+```{r}
+
+ggplot(latest_schooling_by_race, aes(x = race, y = count, fill = latest_school_type)) +
+  geom_col(position = "dodge") +
+  labs(title = "Latest Schooling Type by Race",
+       x = "Race",
+       y = "Count",
+       fill = "School Type") +
+  scale_y_continuous(labels = scales::label_comma()) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
@@ -127,21 +165,40 @@ ggplot(latest_schooling_by_race, aes(x = race, y = count)) +
 
 ```{r}
 latest_schooling_by_gender <- asvab_clean |> 
-    group_by(race, latest_school_type) |> 
+    group_by(sex, latest_school_type) |> 
   summarise(count = n(), .groups = "drop")
 
 print(latest_schooling_by_gender) 
   
 ```
 
+### Graph of Latest Schooling By Gender 
+```{r}
+ggplot(latest_schooling_by_gender, aes(x = sex, y = count, fill = latest_school_type)) +
+  geom_col(position = "dodge") +
+  labs(title = "Latest Schooling Type by Gender",
+       x = "Gender",
+       y = "Count",
+       fill = "School Type") +
+  scale_y_continuous(labels = scales::label_comma()) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+
+
 ### General Science Asvab scores by race 
 ```{r}
 
-general_science_scores <- asvab_clean |> 
-    group_by(race, asvab_gs) |> 
-  summarise(count = n(), .groups = "drop")
+general_science_scores_collapsed <- asvab_clean %>%
+  separate_rows(race, sep = ",\\s*") %>%  # Split multi-race values into individual rows
+  group_by(race, asvab_gs) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(race, asvab_gs)
 
-print(general_science_scores) 
+print(general_science_scores_collapsed)
 
 
 ```
@@ -163,37 +220,20 @@ ggplot(general_science_scores, aes(x = asvab_gs, y = count)) +
 
 ```
 
-```{r}
-ggplot(asvab_clean, aes(x = asvab_gs)) +
-  geom_histogram(binwidth = 2, fill = "#3182bd", color = "white") +
-  facet_wrap(~ race, scales = "free_y") +
-  labs(
-    title = "Distribution of ASVAB General Science Scores by Race",
-    x = "ASVAB GS Score",
-    y = "Count"
-  ) +
-  theme_minimal() +
-  theme(
-    strip.text = element_text(size = 8),
-    axis.text.x = element_text(size = 6)
-  )
-```
 
-### fix this 
 ```{r}
 ggplot(general_science_scores, aes(x = asvab_gs, y = count, fill = race)) +
   geom_col(position = "dodge") +
-  labs(
-    title = "Distribution of ASVAB GS Scores by Race",
-    x = "ASVAB GS Score",
-    y = "Count",
-    fill = "Race"
-  ) +
-  theme_minimal(base_size = 12) +
+  labs(title = "ASVAB GS Scores by Race",
+       x = "ASVAB GS Score",
+       y = "Count",
+       fill = "Race") +
+  scale_y_continuous(labels = scales::label_comma()) +
+  theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "bottom"
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6)
   )
 ```
+
 
 
