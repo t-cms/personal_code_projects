@@ -204,36 +204,7 @@ print(general_science_scores_collapsed)
 ```
 
 
-### trying to make graphics for the genearl science asvab scores 
-```{r}
-ggplot(general_science_scores, aes(x = asvab_gs, y = count)) +
-  geom_col(fill = "#3182bd") +
-  facet_wrap(~ race, scales = "free_y") +
-  labs(title = "ASVAB GS Scores by Race",
-       x = "ASVAB GS Score",
-       y = "Count") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6),
-    strip.text = element_text(face = "bold", size = 10)
-  )
 
-```
-
-
-```{r}
-ggplot(general_science_scores, aes(x = asvab_gs, y = count, fill = race)) +
-  geom_col(position = "dodge") +
-  labs(title = "ASVAB GS Scores by Race",
-       x = "ASVAB GS Score",
-       y = "Count",
-       fill = "Race") +
-  scale_y_continuous(labels = scales::label_comma()) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6)
-  )
-```
 
 
 
