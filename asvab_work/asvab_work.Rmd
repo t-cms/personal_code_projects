@@ -12,6 +12,7 @@ library(tidyverse)
 library(readxl)
 library(rio)
 library(janitor)
+library(ggplot2)
 
 ```
 
@@ -46,7 +47,10 @@ asvab_clean <- asvab_data %>%
   
 ```
 
-##summarizing the data 
+
+
+
+## summarizing the data 
   
   ### race distribution 
 
@@ -103,6 +107,22 @@ latest_schooling_by_race <- asvab_clean |>
 print(latest_schooling_by_race)
 ```
 
+```{r}
+ggplot(latest_schooling_by_race, aes(x = race, y = count)) +
+  geom_col(fill = "#2c7fb8") +
+  facet_wrap(~ latest_school_type, scales = "free_y") +  # each school type gets its own plot
+  labs(title = "Race Count per School Type",
+       x = "Race",
+       y = "Count") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 7),
+    strip.text = element_text(size = 10),
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )
+
+```
+
 ### Latest Schooling By Gender 
 
 ```{r}
@@ -110,7 +130,70 @@ latest_schooling_by_gender <- asvab_clean |>
     group_by(race, latest_school_type) |> 
   summarise(count = n(), .groups = "drop")
 
-print(latest_schooling_by_gender)
+print(latest_schooling_by_gender) 
   
 ```
+
+### General Science Asvab scores by race 
+```{r}
+
+general_science_scores <- asvab_clean |> 
+    group_by(race, asvab_gs) |> 
+  summarise(count = n(), .groups = "drop")
+
+print(general_science_scores) 
+
+
+```
+
+
+### trying to make graphics for the genearl science asvab scores 
+```{r}
+ggplot(general_science_scores, aes(x = asvab_gs, y = count)) +
+  geom_col(fill = "#3182bd") +
+  facet_wrap(~ race, scales = "free_y") +
+  labs(title = "ASVAB GS Scores by Race",
+       x = "ASVAB GS Score",
+       y = "Count") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6),
+    strip.text = element_text(face = "bold", size = 10)
+  )
+
+```
+
+```{r}
+ggplot(asvab_clean, aes(x = asvab_gs)) +
+  geom_histogram(binwidth = 2, fill = "#3182bd", color = "white") +
+  facet_wrap(~ race, scales = "free_y") +
+  labs(
+    title = "Distribution of ASVAB General Science Scores by Race",
+    x = "ASVAB GS Score",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 8),
+    axis.text.x = element_text(size = 6)
+  )
+```
+
+### fix this 
+```{r}
+ggplot(general_science_scores, aes(x = asvab_gs, y = count, fill = race)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Distribution of ASVAB GS Scores by Race",
+    x = "ASVAB GS Score",
+    y = "Count",
+    fill = "Race"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
+```
+
 
