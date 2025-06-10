@@ -205,6 +205,114 @@ print(general_science_scores_collapsed)
 
 
 
+### clerical is a composite score of those four sections
+
+Clerical (CL) – AR, MK, PC and WK
+
+Combat (CO) – AS, PC, MC, WK
+
+Electronics (EL) – AR, EI, GS, MK
+
+Field Artillery (FA) – AR, MK, MC
+
+General Maintenance (GM) – AS, EI, GS, MK
+
+General Technical (GT) -AR, PC, WK
+
+Mechanical Maintenance (MM) – AS, EI, MC
+
+Operators and Food (OF) – AS, PC, MC, WK
+
+Surveillance and Communications (SC) – AR, AS, MC, PC, WK
+
+Skilled Technical (ST) – GS, MK, MC, PC, WK
+
+Questions: 
+** Which gender and which race is more associated with each composite score section? **
+** What races and what genders qualify for what type of careers? ** 
 
 
+
+
+### Clerical Scores
+
+```{r}
+
+clerical_scores <- asvab_clean |> 
+  select(asvab_ar, asvab_mk, asvab_pc, asvab_wk, race, sex)
+clerical_scores <- clerical_scores |>
+    mutate(total_score = (asvab_ar + asvab_mk + asvab_pc + asvab_wk))
+print(clerical_scores)
+
+```
+
+
+```{r}
+grouped_clerical_scores <- clerical_scores |> 
+  group_by(race, sex) |> 
+  summarize(
+    mean_total_score = mean(total_score, na.rm = TRUE),
+    total_score_sum = sum(total_score, na.rm = TRUE),
+    count = n(),
+    sd_total_score = sd(total_score, na.rm = TRUE)
+  )
+print(grouped_composite_scores) 
+```
+### Graphic of the Average ASVAB Clerical Scores by Race and Gender (need to redo to try to show elibility-- ask shelita about it)
+```{r}
+
+ggplot(clerical_scores, aes(x = race, y = total_score, fill = sex)) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+  labs(
+    title = "Average ASVAB Clerical Scores by Race and Gender",
+    x = "Race",
+    y = "Average Total Score"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+### Combat Score- Combat (CO) – AS, PC, MC, WK
+
+```{r}
+combat_scores <- asvab_clean |> 
+  select(asvab_as, asvab_pc, asvab_mc, asvab_wk, race, sex)
+combat_scores <- combat_scores |>
+  mutate(total_score = (asvab_as + asvab_pc + asvab_mc + asvab_wk))
+print(combat_scores)
+
+```
+
+
+```{r}
+grouped_combat_scores <- combat_scores |> 
+  group_by(race, sex) |> 
+  summarize(
+    mean_total_score = mean(total_score, na.rm = TRUE),
+    total_score_sum = sum(total_score, na.rm = TRUE),
+    count = n(),
+    sd_total_score = sd(total_score, na.rm = TRUE)
+  )
+print(grouped_combat_scores) 
+
+```
+
+### Electronics (EL) – AR, EI, GS, MK
+```{r}
+electronics_scores <- asvab_clean |> 
+  select(asvab_ar, asvab_ei, asvab_gs, asvab_mk, race, sex)
+electronics_scores <- electronics_scores |>
+  mutate(total_score = (asvab_ar + asvab_ei + asvab_gs + asvab_mk))
+print(electronics_scores)
+```
+
+Field Artillery (FA) – AR, MK, MC
+```{r}
+field_artillery_scores <- asvab_clean |> 
+  select(asvab_ar, asvab_mk, asvab_mc, race, sex) 
+field_artillery_scores <- field_artillery_scores |>
+  mutate(total_scores = (asvab_ar + asvab_mk + asvab_mc)) 
+print(field_artillery_scores)
+```
 
