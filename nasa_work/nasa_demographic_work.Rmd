@@ -1,0 +1,335 @@
+---
+title: "nasa_demographic_work"
+author: "Tiasia Saunders"
+date: "2025-06-11"
+output: html_document
+---
+# NASA Pathways Program Demographical Data Analysis 
+
+## 1. Introduction
+
+The NASA Pathways Program is a structured internship and employment initiative designed to provide students and recent graduates with opportunities to work at NASA. It aims to develop the next generation of scientists, engineers, and professionals by offering hands-on experience in various fields related to space exploration and aeronautics.
+
+The data used in this analysis was obtained through a Freedom of Information Act (FOIA) request submitted on December 16, 2024, to the NASA Pathways Program office. This request aimed to collect demographic information about program participants to better understand diversity and inclusion within NASA’s workforce. NASA responded to the request on 02/05/24 and provided a dataset that covers the years 2021 to 2024, a period before President Donald Trump’s executive order that sought to eliminate Diversity, Equity, and Inclusion initiatives in federal agencies. It includes information on applicants and hires, broken down by race and gender, as well as data on the high schools attended by hired applicants. 
+
+## 2. Purpose of Analysis
+
+State the purpose of your analysis: What questions are you trying to answer? (e.g., demographics, trends, program effectiveness, diversity)
+
+The purpose of the analysis is to explore the demographic composition of the NASA Pathways Program participants, identify trends in participation over time, and assess the program's effectiveness in promoting diversity and inclusion. 
+
+Key questions include:
+
+1. 
+
+Briefly mention the relevance or potential impact of your findings.
+
+3. Data Description:
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+library(readxl)
+library(rio)
+library(janitor)
+library(ggplot2)
+library(scales)
+library(googlesheets4)
+```
+
+
+```{r}
+# Load the dataset
+# URL or Sheet ID of your Google Sheet
+sheet_url <- "https://docs.google.com/spreadsheets/d/1Q6PkpHHbxN6xLqDUhYBhohQUFN4JI1Ms_3-5cKhbxsE/edit?gid=0#gid=0"
+
+# Get all sheet/tab names
+sheet_info <- gs4_get(sheet_url)
+
+# Extract sheet names
+sheet_names <- sheet_info$sheets$name
+print(sheet_names)
+
+
+```
+```{r}
+all_sheets <- lapply(sheet_names, function(sheet) {
+  read_sheet(sheet_url, sheet = sheet)
+})
+
+# Name the list elements by sheet/tab names
+names(all_sheets) <- sheet_names
+```
+```{r}
+# Suppose these are your sheet names
+names(all_sheets)
+
+# Assign each to its own variable
+applicants_race <- all_sheets[["Applicants by Race"]]
+applicants_gender <- all_sheets[["Applicants Group by Gender"]]
+hired_gender <- all_sheets[["Hired Group by Gender"]]
+hired_race <- all_sheets[["Hired Group by Race "]]
+msi_non_msi <-all_sheets[["MSI versus Non-MSI Schools"]]
+msi_type <-all_sheets [["MSI-Type"]]
+
+```
+
+
+```{r}
+summary(applicants_gender)
+summary(applicants_race)
+```
+
+
+```{r}
+summary(hired_gender)
+summary(hired_race)
+```
+
+
+### Applicants Demographical Data Analysis 
+
+```{r}
+applicants_gender_filtered <- applicants_gender_filtered |> 
+  clean_names() |> 
+  mutate(
+    fiscal_year = as.numeric(unlist(fiscal_year_fy)))
+
+```
+
+```{r}
+applicants_gender_filtered <- applicants_gender |> 
+  filter(applicant_group %in% c("Male", "Female"))
+
+# Plot Male vs Female over years
+ggplot(applicants_gender_filtered, aes(x = fiscal_Year, y = total_applicants, color = applicant_group)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  labs(title = "Applicants by Gender Over Time",
+       x = "Fiscal Year",
+       y = "Number of Applicants",
+       color = "Gender",
+         caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
+       ) +
+  
+  theme_minimal()
+ 
+  
+
+```
+
+```{r}
+applicants_race <- applicants_race |> 
+  clean_names() 
+ 
+```
+
+
+```{r}
+# Plot Male vs Female over years
+ggplot(applicants_race, aes(x = fiscal_year, y = applicants, color = race)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  labs(title = "Applicants by Race Over Time",
+       x = "Fiscal Year",
+       y = "Number of Applicants",
+       color = "Gender",
+         caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
+       ) +
+        coord_cartesian(ylim = c(0, 10000))
+  
+  theme_minimal()
+```
+
+
+#### Hired Applicants Demographical Data Analysis 
+
+```{r}
+hired_gender <- hired_gender |> 
+  clean_names() |> 
+  mutate(
+    fiscal_year = as.numeric(unlist(fiscal_year_fy)))
+```
+
+```{r}
+hired_gender_filtered <- hired_gender |> 
+  filter(group %in% c("Male", "Female"))
+
+# Plot Male vs Female over years
+ggplot(hired_gender_filtered, aes(x = fiscal_year, y = hires_total, color = group)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  labs(title = " Hired Applicants by Gender Over Time",
+       x = "Fiscal Year",
+       y = "Number of Applicants",
+       color = "Gender",
+         caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
+       ) +
+  
+  theme_minimal()
+ 
+
+
+```
+
+```{r}
+hired_race <- hired_race |> 
+  clean_names()
+```
+
+
+```{r}
+ggplot(hired_race, aes(x = fiscal_year_fy, y = hires, color = group)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  labs(title = "Hired Applicants by Race Over Time",
+       x = "Fiscal Year",
+       y = "Number of Applicants",
+       color = "Gender",
+         caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
+       ) +
+        coord_cartesian(ylim = c(0, 300))
+  
+  theme_minimal()
+```
+
+### Minority Serving Institutions versus Non-Minority Serving Schools 
+
+```{r}
+msi_non_msi <- msi_non_msi |> 
+  clean_names() |> 
+  pivot_longer(cols = c(msi, non_msi),  
+               names_to = "msi_status",
+               values_to = "total_applicants")
+```
+
+
+```{r}
+ggplot(msi_non_msi, aes(x = fiscal_year, y = total_applicants, fill = msi_status)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("msi" = "lightblue", "non_msi" = "lavender")) +
+  labs(title = "Applicants from MSI vs Non-MSI Schools Over Time",
+       x = "Fiscal Year",
+       y = "Number of Applicants",
+       fill = "MSI Status",
+         caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
+       ) +
+  theme_minimal()
+
+```
+
+### MSI Type 
+** HSI: Hispanic-Serving Institution **				
+** AANAPISI: Asian American and Native American Pacific Islander-Serving Institution **			
+** HBCU: Historically Black Colleges and Universities	**			
+** PBI: Predominantly Black Institution **			
+
+```{r}
+msi_type <- msi_type |> 
+  clean_names()
+```
+
+
+### MSI Types 
+```{r}
+# Example data frame
+msi_data <- tibble(
+  MSI_Type = c("HSI", "HSI, AANAPISI", "AANAPISI", "HBCU", "PBI"),
+  Percentage = c("28.0%", "43.3%", "21.7%", "6.4%", "0.64%")
+)
+
+# Remove % sign and convert to numeric
+msi_data <- msi_data %>%
+  mutate(
+    Percentage_num = as.numeric(gsub("%", "", Percentage))
+  )
+
+# Calculate positions for labels
+msi_data <- msi_data %>%
+  arrange(desc(MSI_Type)) %>%
+  mutate(
+    ypos = cumsum(Percentage_num) - 0.5 * Percentage_num
+  )
+
+# Plot pie chart
+ggplot(msi_data, aes(x = "", y = Percentage_num, fill = MSI_Type)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  geom_text(aes(y = ypos, 
+                label = paste0(MSI_Type, "\n", round(Percentage_num, 2), "%")), 
+            color = "white", size = 3, lineheight = 0.9) +
+  labs(
+    title = "Applicant Percentage by MSI Type",
+    fill = "MSI Type",
+    caption = "Source: NASA Pathways Program Data | Analysis by Your Name"
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5)
+  )
+
+```
+
+
+
+
+
+
+
+
+Describe the dataset: variables, number of records, time span.
+
+Mention any initial cleaning or preprocessing you performed.
+
+Include summary statistics or a snapshot of the data.
+
+4. Methodology
+Describe the analytical approach:
+
+Data cleaning steps (handling missing values, filtering).
+
+Key transformations or calculated metrics (e.g., total scores, participation rates).
+
+Types of analyses used (e.g., demographic breakdown, trends over time, subgroup comparisons).
+
+5. Exploratory Data Analysis (EDA)
+Visualizations showing:
+
+Distribution of key variables.
+
+Demographic breakdown by race, gender, or other relevant categories.
+
+Trends or changes over time.
+
+Interpret each visualization: What story does it tell?
+
+6. Key Findings
+Highlight the most important insights supported by data.
+
+Example findings:
+
+Which groups are most represented?
+
+Are there notable trends in program participation or performance?
+
+Any disparities or successes worth noting?
+
+7. Discussion & Recommendations
+Discuss what your findings might mean for the program.
+
+Suggest possible actions or areas for further study.
+
+Mention limitations of your analysis (e.g., data quality, missing info).
+
+8. Conclusion
+Summarize the overall message.
+
+Reiterate the value of the data and your contribution.
+
+
+
+Code snippets for transparency.
+
+Link to the FOIA request or published paper.
+

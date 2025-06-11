@@ -256,7 +256,7 @@ grouped_clerical_scores <- clerical_scores |>
     count = n(),
     sd_total_score = sd(total_score, na.rm = TRUE)
   )
-print(grouped_composite_scores) 
+print(grouped_clerical_scores) 
 ```
 ### Graphic of the Average ASVAB Clerical Scores by Race and Gender (need to redo to try to show elibility-- ask shelita about it)
 ```{r}
@@ -307,12 +307,127 @@ electronics_scores <- electronics_scores |>
 print(electronics_scores)
 ```
 
-Field Artillery (FA) – AR, MK, MC
+### Field Artillery (FA) – AR, MK, MC
 ```{r}
 field_artillery_scores <- asvab_clean |> 
   select(asvab_ar, asvab_mk, asvab_mc, race, sex) 
 field_artillery_scores <- field_artillery_scores |>
   mutate(total_scores = (asvab_ar + asvab_mk + asvab_mc)) 
 print(field_artillery_scores)
+```
+
+### General Maintenance (GM) – AS, EI, GS, MK
+
+```{r}
+
+general_maintence_scores<- asvab_clean |> 
+  select( asvab_as, asvab_ei, asvab_gs, asvab_mk, race, sex )
+general_maintence_scores <- general_maintence_scores |>
+  mutate(total_score = (asvab_as + asvab_ei + asvab_gs + asvab_mk)) |> 
+print(general_maintence_scores)
+  
+
+```
+
+### General Technical (GT) -AR, PC, WK
+```{r}
+general_technical_scores <- asvab_clean |> 
+  select(asvab_ar, asvab_pc, asvab_wk, race, sex ) 
+general_technical_scores<- general_technical_scores |> 
+  mutate(total_score = (asvab_ar + asvab_pc + asvab_wk)) |>
+  print(general_technical_scores)
+
+```
+
+### Mechanical Maintenance (MM) – AS, EI, MC
+```{r}
+mechanical_maintence_scores <- asvab_clean |> 
+  select( asvab_as, asvab_ei, asvab_mc, race, sex)
+mechanical_maintence_scores <- mechanical_maintence_scores |>
+  mutate(total_score = (asvab_as + asvab_ei + asvab_mc)) |> 
+  print(mechanical_maintence_scores)
+```
+
+
+Operators and Food (OF) – AS, PC, MC, WK
+
+```{r}
+operators_food_scores <- asvab_clean |> 
+  select(asvab_as, asvab_pc, asvab_mc, asvab_wk, race, sex)
+operators_food_scores <- operators_food_scores |>
+  mutate(total_score = (asvab_as + asvab_pc + asvab_mc + asvab_wk)) |> 
+  print(operators_food_scores)
+
+```
+
+### Operators and Food Eligibility (using 85 as the min score because of an online search) 
+```{r}
+# Filter for total_score > 91
+above_85 <- operators_food_scores |> 
+  filter(total_score >= 85)
+
+# Count number of each race above 91
+of_race_counts <- above_85 |> 
+  count(race)
+
+# Plot the counts
+ggplot(of_race_counts, aes(x = race, y = n, fill = race)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Individuals by Race with Total Score >= 85",
+       x = "Race",
+       y = "Count") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+
+Surveillance and Communications (SC) – AR, AS, MC, PC, WK
+
+```{r}
+surveilance_comms_score <- asvab_clean |> 
+  select(asvab_ar, asvab_as, asvab_mc, asvab_pc, asvab_wk, race, sex)
+surveilance_comms_score <- surveilance_comms_score |>
+  mutate(total_score = (asvab_ar + asvab_as + asvab_mc + asvab_pc + asvab_wk)) |> 
+  print(surveilance_comms_score)
+```
+
+
+Skilled Technical (ST) – GS, MK, MC, PC, WK
+
+```{r}
+skilled_technical <- asvab_clean |> 
+  select(asvab_gs, asvab_mk, asvab_mc, asvab_pc, asvab_wk, race, sex) 
+skilled_technical <- skilled_technical |>
+  mutate(total_score = (asvab_gs + asvab_mk + asvab_mc + asvab_pc + asvab_wk)) |> 
+  print(skilled_technical)
+
+```
+
+### Skilled Technican Eligbility (using 91 as the min score because of an online search) 
+
+```{r}
+# Filter for total_score > 91
+above_91 <- skilled_technical |> 
+  filter(total_score >= 91)
+
+# Count number of each race above 91
+st_race_counts <- above_91 |> 
+  count(race)
+
+# Plot the counts
+ggplot(st_race_counts, aes(x = race, y = n, fill = race)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Individuals by Race with Total Score > 91",
+       x = "Race",
+       y = "Count") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
 ```
 
