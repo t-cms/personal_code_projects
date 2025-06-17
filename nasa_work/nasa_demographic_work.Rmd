@@ -20,11 +20,59 @@ The purpose of the analysis is to explore the demographic composition of the NAS
 
 Key questions include:
 
-1. 
+1. What are the demographic characteristics of applicants and hires in the NASA Pathways Program?
+2. How do these characteristics change over time?
+3. What is the makeup of MSI (Minority Serving Institutions) versus Non-MSI schools among applicants?
 
 Briefly mention the relevance or potential impact of your findings.
 
-3. Data Description:
+## 3. Data Description
+
+The dataset includes:
+
+- Applicant and hire counts by race and gender (FY21–FY24)
+- Institutional affiliation (MSI vs. Non-MSI)
+- Breakdown of MSI types
+
+Variables include fiscal year, demographic categories (race, gender), applicant/hire totals, and institutional status.
+
+Data cleaning steps included:
+
+- Standardizing column names
+- Filtering out 'Omitted' and 'NA' values
+- Converting percentage strings to numeric types
+- Reshaping wide-form data to long-form where needed
+
+Initial observations:
+
+- Gender data showed a heavy 'Omitted' category
+- Some sheets required numeric conversion of fiscal years
+- MSI categories required parsing from grouped labels
+- (Summary statistics shown in summary() output below.)
+
+## 4. Methodology
+
+The analysis follows this workflow:
+
+-  Data ingestion from Google Sheets using googlesheets4
+- Cleaning and transformation using dplyr, janitor, and tidyr
+- Plotting trends over time with ggplot2
+- Breakdown of categories by race, gender, and institution type
+- Use of bar plots, line charts, and a pie chart for clear visualization
+- Calculated metrics include percentage shares, year-over-year comparisons, and groupwise summaries.
+
+## 5. Exploratory Data Analysis (EDA)
+
+Visualizations include:
+
+- Applicants by Gender Over Time: Shows more male applicants but a gradual increase in female participation.
+- Applicants by Race Over Time: Highlights disparities, particularly low Black and Native Hawaiian representation.
+= Hires by Gender and Race: Mirrors applicant patterns with continued underrepresentation of women and minorities.
+- MSI vs. Non-MSI: Non-MSI institutions consistently have higher applicant numbers.
+- MSI Type Breakdown: HSI and AANAPISI dominate; PBI and HBCUs are minimally represented.
+- Each visualization uncovers both progress and persisting gaps in NASA's outreach and recruitment efforts.
+
+
 
 ```{r}
 # Load necessary libraries
@@ -90,19 +138,20 @@ summary(hired_race)
 ### Applicants Demographical Data Analysis 
 
 ```{r}
-applicants_gender_filtered <- applicants_gender_filtered |> 
+applicants_gender_filtered <- applicants_gender |> 
   clean_names() |> 
   mutate(
     fiscal_year = as.numeric(unlist(fiscal_year_fy)))
 
 ```
 
+#### Applicants by Gender Over Time 
 ```{r}
-applicants_gender_filtered <- applicants_gender |> 
+applicants_gender_filtered <- applicants_gender_filtered |> 
   filter(applicant_group %in% c("Male", "Female"))
 
 # Plot Male vs Female over years
-ggplot(applicants_gender_filtered, aes(x = fiscal_Year, y = total_applicants, color = applicant_group)) +
+ggplot(applicants_gender_filtered, aes(x = fiscal_year, y = total_applicants, color = applicant_group)) +
   geom_line(size = 1.2) +
   geom_point(size = 3) +
   labs(title = "Applicants by Gender Over Time",
@@ -117,6 +166,11 @@ ggplot(applicants_gender_filtered, aes(x = fiscal_Year, y = total_applicants, co
   
 
 ```
+- Displays the number of male and female applicants to the NASA Pathways Program from 2021 to 2024.
+- Male applicants consistently outnumber females, but female participation shows a gradual increase in 2023. 
+- Dataset filtered to include only male and female applicants for clearer comparison.
+- Note: A large number of applicants are labeled 'Omitted', which may impact interpretation.
+
 
 ```{r}
 applicants_race <- applicants_race |> 
@@ -126,10 +180,21 @@ applicants_race <- applicants_race |>
 
 
 ```{r}
-# Plot Male vs Female over years
+
 ggplot(applicants_race, aes(x = fiscal_year, y = applicants, color = race)) +
   geom_line(size = 1.2) +
   geom_point(size = 3) +
+  scale_color_manual(
+    values = c(
+      "2 or More Races" = "#D62728",                  
+      "American Indian or Alaska Native" = "#9467BD", 
+      "Asian" = "#1F77B4",                           
+      "Black or African American" = "#FF7F0E",       
+      "Hispanic or Latino" = "#2CA02C",              
+      "Native Hawaiian or Other Pacific Islander" = "#8C564B",
+      "White" = "#17BECF"                            
+    )
+  ) +
   labs(title = "Applicants by Race Over Time",
        x = "Fiscal Year",
        y = "Number of Applicants",
@@ -138,9 +203,12 @@ ggplot(applicants_race, aes(x = fiscal_year, y = applicants, color = race)) +
        ) +
         coord_cartesian(ylim = c(0, 10000))
   
-  theme_minimal()
+  theme_dark()
 ```
-
+- Displays the number of applicants by race to the NASA Pathways Program from 2021 to 2024.
+- White applicants consistently make up the largest group, followed by Asian and Hispanic or Latino applicants.
+- White applicants doubles the number of Black or African American applicants, indicating a significant racial disparity.
+- Indicates the need for targeted efforts to increase diversity, particularly among Black or African American and Native Hawaiian or Other Pacific Islander applicants.
 
 #### Hired Applicants Demographical Data Analysis 
 
@@ -171,6 +239,14 @@ ggplot(hired_gender_filtered, aes(x = fiscal_year, y = hires_total, color = grou
 
 
 ```
+-Displays the number of hired male and female applicants to the NASA Pathways Program from 2021 to 2024.  
+- Displays the number of male and female applicants to the NASA Pathways Program from 2021 to 2024.
+- Male applicants outnumber females, the gap seems to widen in 2022 to 2023. 
+- Indicates progress towards improving gender diversity within the program.
+- Dataset filtered to include only male and female applicants for clearer comparison.
+- Note: A large number of applicants are labeled 'Omitted', which may impact interpretation.
+
+
 
 ```{r}
 hired_race <- hired_race |> 
@@ -217,6 +293,15 @@ ggplot(msi_non_msi, aes(x = fiscal_year, y = total_applicants, fill = msi_status
   theme_minimal()
 
 ```
+- Non-MSI participation consistently outpaces MSI participation across all four fiscal years.
+- In FY21, Non-MSI entries nearly doubled MSI entries (96 vs. 49).
+- FY22 saw a dip in MSI involvement (38), while Non-MSI participation slightly increased to 101.
+- FY23 marked the highest year overall, but the gap remained wide: 106 Non-MSI vs. 49 MSI.
+- FY24 shows a sharp drop for both groups, but the decline was steeper for MSIs (down to just 21 entries).
+- Over the four years, Non-MSI institutions made up nearly 70% of all entries.
+- The persistent disparity suggests structural or access-related differences between MSI and Non-MSI engagement.
+
+
 
 ### MSI Type 
 ** HSI: Hispanic-Serving Institution **				
@@ -270,66 +355,51 @@ ggplot(msi_data, aes(x = "", y = Percentage_num, fill = MSI_Type)) +
   )
 
 ```
+- HSI and AANAPISI institutions combined make up the largest share, accounting for 43.3% of the total.
+- HSIs alone follow closely, representing 28%, suggesting strong participation from Hispanic-Serving Institutions overall.
+- AANAPISIs contribute 21.7%, showing notable representation from Asian American and Native American Pacific Islander institutions.
+- HBCUs make up just 6.4%, highlighting a much smaller footprint compared to other MSI types.
+- PBIs are the least represented, contributing only 0.64%, a stark contrast to other MSI categories.
+- The data suggests that while some MSI types are highly engaged, others—especially PBIs and HBCUs—may face barriers to participation or inclusion.
+
+## 6. Key Findings
+
+- White applicants dominate each year, followed by Asian and Hispanic/Latino individuals.
+- Black and Native Hawaiian groups are significantly underrepresented.
+- Male applicants consistently outnumber females across both applicants and hires.
+- Non-MSI schools produce more applicants than MSI schools across all years.
+- HSI and AANAPISI institutions contribute the majority of MSI applicants.
+
+## 7. Discussion & Recommendations
+- These findings suggest that while NASA is attracting some diversity through HSI and AANAPISI institutions, there's a need to:
+- Increase recruitment efforts at PBIs and HBCUs
+- Address gender imbalances by targeting female STEM students
+- Encourage more transparent reporting to reduce 'Omitted' data
+- Evaluate outreach efforts for Pacific Islander and Indigenous groups
+
+Limitations:
+
+- Missing or omitted demographic data
+- Potential reporting inconsistencies across institutions
+- Dataset does not include information on outcomes beyond hiring
+
+## 8. Conclusion
+
+The NASA Pathways Program has made strides toward inclusivity, but gaps remain in racial and gender representation. By identifying where disparities exist—especially in MSI engagement and racial equity—NASA can take targeted steps to ensure a more representative workforce that reflects the diverse talent pool across the nation.
+
+## 9. Publication Link 
+[The Unsurprising Lack of DEIA in NASA’s Pathways Program Hiring Patterns](https://scholarscompass.vcu.edu/semss_pubs/1/)
+
+## 10. Resources
+
+FOIA Request to NASA Pathways Program (Submitted Dec 16, 2024)
+
+GitHub Repository with R Markdown & Data
+
+Contact: Tiasia Saunders – Data Journalist & Analyst
 
 
 
 
 
-
-
-
-Describe the dataset: variables, number of records, time span.
-
-Mention any initial cleaning or preprocessing you performed.
-
-Include summary statistics or a snapshot of the data.
-
-4. Methodology
-Describe the analytical approach:
-
-Data cleaning steps (handling missing values, filtering).
-
-Key transformations or calculated metrics (e.g., total scores, participation rates).
-
-Types of analyses used (e.g., demographic breakdown, trends over time, subgroup comparisons).
-
-5. Exploratory Data Analysis (EDA)
-Visualizations showing:
-
-Distribution of key variables.
-
-Demographic breakdown by race, gender, or other relevant categories.
-
-Trends or changes over time.
-
-Interpret each visualization: What story does it tell?
-
-6. Key Findings
-Highlight the most important insights supported by data.
-
-Example findings:
-
-Which groups are most represented?
-
-Are there notable trends in program participation or performance?
-
-Any disparities or successes worth noting?
-
-7. Discussion & Recommendations
-Discuss what your findings might mean for the program.
-
-Suggest possible actions or areas for further study.
-
-Mention limitations of your analysis (e.g., data quality, missing info).
-
-8. Conclusion
-Summarize the overall message.
-
-Reiterate the value of the data and your contribution.
-
-
-
-Code snippets for transparency.
-
-Link to the FOIA request or published paper.
 
