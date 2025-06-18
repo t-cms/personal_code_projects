@@ -355,6 +355,7 @@ ggplot(msi_data, aes(x = "", y = Percentage_num, fill = MSI_Type)) +
   )
 
 ```
+
 - HSI and AANAPISI institutions combined make up the largest share, accounting for 43.3% of the total.
 - HSIs alone follow closely, representing 28%, suggesting strong participation from Hispanic-Serving Institutions overall.
 - AANAPISIs contribute 21.7%, showing notable representation from Asian American and Native American Pacific Islander institutions.
