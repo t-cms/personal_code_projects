@@ -134,6 +134,10 @@ summary(hired_gender)
 summary(hired_race)
 ```
 
+```{r}
+summary(msi_non_msi)
+```
+
 
 ### Applicants Demographical Data Analysis 
 
@@ -159,10 +163,7 @@ ggplot(applicants_gender_filtered, aes(x = fiscal_year, y = total_applicants, co
        y = "Number of Applicants",
        color = "Gender",
          caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
-       ) +
-  
-  theme_minimal()
- 
+       ) 
   
 
 ```
@@ -203,7 +204,7 @@ ggplot(applicants_race, aes(x = fiscal_year, y = applicants, color = race)) +
        ) +
         coord_cartesian(ylim = c(0, 10000))
   
-  theme_dark()
+
 ```
 - Displays the number of applicants by race to the NASA Pathways Program from 2021 to 2024.
 - White applicants consistently make up the largest group, followed by Asian and Hispanic or Latino applicants.
@@ -239,7 +240,7 @@ ggplot(hired_gender_filtered, aes(x = fiscal_year, y = hires_total, color = grou
 
 
 ```
--Displays the number of hired male and female applicants to the NASA Pathways Program from 2021 to 2024.  
+- Displays the number of hired male and female applicants to the NASA Pathways Program from 2021 to 2024.  
 - Displays the number of male and female applicants to the NASA Pathways Program from 2021 to 2024.
 - Male applicants outnumber females, the gap seems to widen in 2022 to 2023. 
 - Indicates progress towards improving gender diversity within the program.
@@ -266,7 +267,7 @@ ggplot(hired_race, aes(x = fiscal_year_fy, y = hires, color = group)) +
        ) +
         coord_cartesian(ylim = c(0, 300))
   
-  theme_minimal()
+
 ```
 
 ### Minority Serving Institutions versus Non-Minority Serving Schools 
@@ -289,8 +290,8 @@ ggplot(msi_non_msi, aes(x = fiscal_year, y = total_applicants, fill = msi_status
        y = "Number of Applicants",
        fill = "MSI Status",
          caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
-       ) +
-  theme_minimal()
+       ) 
+  
 
 ```
 - Non-MSI participation consistently outpaces MSI participation across all four fiscal years.
@@ -378,20 +379,20 @@ ggplot(msi_data, aes(x = "", y = Percentage_num, fill = MSI_Type)) +
 - Encourage more transparent reporting to reduce 'Omitted' data
 - Evaluate outreach efforts for Pacific Islander and Indigenous groups
 
-Limitations:
+## 8. Limitations:
 
 - Missing or omitted demographic data
 - Potential reporting inconsistencies across institutions
 - Dataset does not include information on outcomes beyond hiring
 
-## 8. Conclusion
+## 9. Conclusion
 
 The NASA Pathways Program has made strides toward inclusivity, but gaps remain in racial and gender representation. By identifying where disparities exist—especially in MSI engagement and racial equity—NASA can take targeted steps to ensure a more representative workforce that reflects the diverse talent pool across the nation.
 
-## 9. Publication Link 
+## 10. Publication Link 
 [The Unsurprising Lack of DEIA in NASA’s Pathways Program Hiring Patterns](https://scholarscompass.vcu.edu/semss_pubs/1/)
 
-## 10. Resources
+## 11. Resources
 
 FOIA Request to NASA Pathways Program (Submitted Dec 16, 2024)
 
