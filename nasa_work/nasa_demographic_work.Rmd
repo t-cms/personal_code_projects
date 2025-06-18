@@ -167,6 +167,7 @@ ggplot(applicants_gender_filtered, aes(x = fiscal_year, y = total_applicants, co
   
 
 ```
+
 - Displays the number of male and female applicants to the NASA Pathways Program from 2021 to 2024.
 - Male applicants consistently outnumber females, but female participation shows a gradual increase in 2023. 
 - Dataset filtered to include only male and female applicants for clearer comparison.
@@ -206,6 +207,7 @@ ggplot(applicants_race, aes(x = fiscal_year, y = applicants, color = race)) +
   
 
 ```
+
 - Displays the number of applicants by race to the NASA Pathways Program from 2021 to 2024.
 - White applicants consistently make up the largest group, followed by Asian and Hispanic or Latino applicants.
 - White applicants doubles the number of Black or African American applicants, indicating a significant racial disparity.
@@ -233,13 +235,12 @@ ggplot(hired_gender_filtered, aes(x = fiscal_year, y = hires_total, color = grou
        y = "Number of Applicants",
        color = "Gender",
          caption = "Source: NASA Pathways Program Data | Analysis by Tiasia Saunders", 
-       ) +
-  
-  theme_minimal()
+       ) 
  
 
 
 ```
+
 - Displays the number of hired male and female applicants to the NASA Pathways Program from 2021 to 2024.  
 - Displays the number of male and female applicants to the NASA Pathways Program from 2021 to 2024.
 - Male applicants outnumber females, the gap seems to widen in 2022 to 2023. 
@@ -270,6 +271,15 @@ ggplot(hired_race, aes(x = fiscal_year_fy, y = hires, color = group)) +
 
 ```
 
+- Displays the number of hires by racial group from 2021 to 2024.
+- White individuals were consistently the most hired group, with a peak of 125 hires in 2022.
+- Asian hires increased in 2022 and 2023, before dropping in 2024.
+- Hispanic or Latino hires rose from 2021 to 2023, reaching 43, then declined in 2024.
+- Black or African American hires peaked in 2021 and steadily declined through 2024.
+- American Indian or Alaska Native and Native Hawaiian or Other Pacific Islander groups had the lowest hire counts, with multiple years showing zero hires.
+- Two or More Races hires remained minimal, never exceeding 3 in a single year.
+- Overall hiring peaked in 2022 and declined notably in 2024. 
+
 ### Minority Serving Institutions versus Non-Minority Serving Schools 
 
 ```{r}
@@ -294,6 +304,7 @@ ggplot(msi_non_msi, aes(x = fiscal_year, y = total_applicants, fill = msi_status
   
 
 ```
+
 - Non-MSI participation consistently outpaces MSI participation across all four fiscal years.
 - In FY21, Non-MSI entries nearly doubled MSI entries (96 vs. 49).
 - FY22 saw a dip in MSI involvement (38), while Non-MSI participation slightly increased to 101.
