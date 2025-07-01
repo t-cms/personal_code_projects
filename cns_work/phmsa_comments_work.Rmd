@@ -182,10 +182,12 @@ ggplot(overall_sentiment_count, aes(x = sentiment, y = n)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-** The most common sentiment of the comments is positive, suggesting that the public is generally supportive of the proposed amendments to LNG facilities. **
-** The second most common sentiment is negative, indicating that there are some concerns about the proposed amendments. **
-** The third most common sentiment is fear, suggesting that there are some fears about the potential impact of the proposed amendments on LNG facilities. **
-** The fourth common sentiment is trust, indicating that there are some concerns about the trustworthiness of the proposed amendments. **
+
+
+- The most common sentiment of the comments is positive, suggesting that the public is generally supportive of the proposed amendments to LNG facilities. 
+- The second most common sentiment is negative, indicating that there are some concerns about the proposed amendments. 
+- The third most common sentiment is fear, suggesting that there are some fears about the potential impact of the proposed amendments on LNG facilities. 
+- The fourth common sentiment is trust, indicating that there are some concerns about the trustworthiness of the proposed amendments. 
 
 
 ## Leading Positive, Negative, Fear, and Trust Sentiments 
