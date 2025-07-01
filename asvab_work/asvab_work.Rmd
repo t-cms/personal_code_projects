@@ -249,8 +249,8 @@ g_plot <- ggplot(general_grouped_eligible, aes(x = race, y = count_eligible, fil
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
+ggsave("general_eligibility_counts.png", plot = g_plot, width = 12, height = 7, dpi = 300, bg = "white")
 
-ggsave("general_eligibility_counts.png", plot = e_plot, width = 12, height = 7, dpi = 300, bg = "white")
 ```
 
 ### Mechanical: Mechanical Comprehension (MC) + Auto & Shop (AS)
