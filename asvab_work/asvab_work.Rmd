@@ -6,8 +6,9 @@ output:
   html_document: default
   pdf_document: default
 ---
-## load libraries    
+  
 ```{r}
+# load libraries  
 library(tidyverse)
 library(readxl)
 library(rio)
@@ -17,32 +18,25 @@ library(scales)
 
 ```
 
-## loading data 
 ```{r}
+# loading data 
 asvab_data <- read_excel("asvab_data_2020-2024.xlsx")
 ```
 
-
-## clean heading names 
 ```{r}
+# clean heading names 
 asvab_data <- asvab_data|> 
   clean_names()
 ```
 
-## clean data 
 
 ```{r}
+
+# clean data 
 asvab_clean <- asvab_data %>%
-  # Remove rows with all NA values (optional)
   filter(if_any(everything(), ~ !is.na(.))) %>%
-  
-  # Trim whitespace from character columns
   mutate(across(where(is.character), str_trim)) %>%
-  
-  # Convert empty strings to NA
   mutate(across(where(is.character), ~ na_if(., ""))) %>%
-  
-  # Handle known inconsistent values (e.g., "N/A", "NA", "Unknown")
   mutate(across(where(is.character), ~ na_if(., "N/A"))) %>%
   mutate(across(where(is.character), ~ na_if(., "Unknown"))) 
   
@@ -51,9 +45,9 @@ asvab_clean <- asvab_data %>%
 
 
 
-## summarizing the data 
+## Summarizing the data 
   
-  ### race distribution 
+  ### Race distribution 
 
 ```{r}
 race_counts <- asvab_clean |> 
@@ -63,7 +57,7 @@ race_counts <- asvab_clean |>
 print(race_counts)
 ```
 
- ### gender distribution 
+ ### Gender distribution 
 ```{r}
 gender_count <- asvab_clean |> 
   count(sex, sort = TRUE) |> 
@@ -83,18 +77,18 @@ ggplot(gender_count, aes(x = sex, y = n, fill = sex)) +
   theme_minimal()
 
 ```
--- there are 332,846 males and 156518	females
+-- There are 332,846 males and 156518	females, meaning that about 32% percent is represented by females and about 56% percent is represented by males. 
 
-  ### age distribution 
+  ### Age distribution 
   
 ```{r}
 age_count <- asvab_clean |> 
   count(age, sort=TRUE) |> 
   print()
 ```
-  ### producing age ranges 
+  ### Producing age ranges 
 ```{r}
-asvab_clean <- asvab_clean %>%
+asvab_clean <- asvab_clean |> 
   mutate(age_range = cut(
     age,
     breaks = c(17, 24, 34, 44, 54, 64, Inf),  # customize as needed
@@ -106,7 +100,6 @@ asvab_clean <- asvab_clean %>%
 
 ```
 
-## age range 
 ```{r}
 asvab_clean |> 
   count(age_range)
@@ -120,7 +113,7 @@ asvab_clean$age_range <- factor(asvab_clean$age_range,
 ggplot(asvab_clean, aes(x = age_range)) +
   geom_bar(fill = "lavender") +
   scale_y_continuous(labels = scales::label_comma()) +
-  scale_x_discrete(drop = FALSE) +  # Prevent ggplot from dropping unused levels
+  scale_x_discrete(drop = FALSE) +  
   labs(title = "Age Range Distribution",
        x = "Age Range",
        y = "Count") +
@@ -130,18 +123,16 @@ ggplot(asvab_clean, aes(x = age_range)) +
 
 
 ```
--- So mostly 16-24 year olds take the ASVAB test 
+-- So mostly 16-24 year olds take the ASVAB test followed by the age range 25-34. 
 
 
 
 ### Latest Schooling By Race 
 ```{r}
-
-# Separate multiracial combinations into individual rows
-latest_schooling_by_race <- asvab_clean %>%
-  separate_rows(race, sep = ",\\s*") %>%  # Split "A, B" into separate rows
-  group_by(race, latest_school_type) %>%
-  summarise(count = n(), .groups = "drop") %>%
+latest_schooling_by_race <- asvab_clean |> 
+  separate_rows(race, sep = ",\\s*") |>   
+  group_by(race, latest_school_type) |> 
+  summarise(count = n(), .groups = "drop") |> 
   arrange(desc(count))
 
 ```
@@ -187,247 +178,228 @@ ggplot(latest_schooling_by_gender, aes(x = sex, y = count, fill = latest_school_
 ```
 
 
+### Composite Scores Breakdown 
 
+** The U.S. Air Force does not have a single, universal minimum composite score for any composite score. Instead, it has different minimum scores for various career fields. So, I will be using the min scores for different career fields that fall under each composite score section.  **
 
-### General Science Asvab scores by race 
-```{r}
+Breakdown of U.S. Air Force Composite Scores: 
+- G	General: Verbal Expression (WK + PC) + Arithmetic Reasoning (AR)
+- M	Mechanical: Mechanical Comprehension (MC) + Auto & Shop (AS)
+- A	Administrative: Verbal Expression (WK + PC)
+- E	Electronics: EI + AR + MK + GS
 
-general_science_scores_collapsed <- asvab_clean %>%
-  separate_rows(race, sep = ",\\s*") %>%  # Split multi-race values into individual rows
-  group_by(race, asvab_gs) %>%
-  summarise(count = n(), .groups = "drop") %>%
-  arrange(race, asvab_gs)
+ G (General) - composite is used for general aptitude jobs that require verbal and math skills.
 
-print(general_science_scores_collapsed)
+M (Mechanical) - focuses on mechanical and technical knowledge.
 
+A (Administrative) - is for clerical and admin roles, based on verbal skills only.
 
-```
-
-
-
-### clerical is a composite score of those four sections
-
-Clerical (CL) – AR, MK, PC and WK
-
-Combat (CO) – AS, PC, MC, WK
-
-Electronics (EL) – AR, EI, GS, MK
-
-Field Artillery (FA) – AR, MK, MC
-
-General Maintenance (GM) – AS, EI, GS, MK
-
-General Technical (GT) -AR, PC, WK
-
-Mechanical Maintenance (MM) – AS, EI, MC
-
-Operators and Food (OF) – AS, PC, MC, WK
-
-Surveillance and Communications (SC) – AR, AS, MC, PC, WK
-
-Skilled Technical (ST) – GS, MK, MC, PC, WK
+E (Electronics) - combines several technical and science-based subtests for electronics and cyber-related roles.
 
 Questions: 
 ** Which gender and which race is more associated with each composite score section? **
 ** What races and what genders qualify for what type of careers? ** 
 
 
-
-
-### Clerical Scores
+### General Scores
 
 ```{r}
 
-clerical_scores <- asvab_clean |> 
-  select(asvab_ar, asvab_mk, asvab_pc, asvab_wk, race, sex)
-clerical_scores <- clerical_scores |>
-    mutate(total_score = (asvab_ar + asvab_mk + asvab_pc + asvab_wk))
-print(clerical_scores)
+general_scores <- asvab_clean |> 
+  select(asvab_ar, asvab_pc, asvab_wk, race, sex)
+general_scores <- general_scores |>
+    mutate(total_score = (asvab_ar + asvab_pc + asvab_wk))
+print(general_scores)
 
 ```
 
 
+### General Eligibility 
+- Using 55 as the min score: qualify for roles such as Administrative (A) and Knowledge Operations (3D0X1)) 
+
 ```{r}
-grouped_clerical_scores <- clerical_scores |> 
-  group_by(race, sex) |> 
+# Filter for individuals with score >= 55
+eligible_general <- general_scores |>
+  filter(total_score >= 55)
+
+general_grouped_eligible <- eligible_general |>
+  group_by(race, sex) |>
   summarize(
-    mean_total_score = mean(total_score, na.rm = TRUE),
-    total_score_sum = sum(total_score, na.rm = TRUE),
-    count = n(),
-    sd_total_score = sd(total_score, na.rm = TRUE)
-  )
-print(grouped_clerical_scores) 
+    count_eligible = as.numeric(n()))
+
+general_grouped_eligible
+
 ```
-### Graphic of the Average ASVAB Clerical Scores by Race and Gender (need to redo to try to show elibility-- ask shelita about it)
+
 ```{r}
 
-ggplot(clerical_scores, aes(x = race, y = total_score, fill = sex)) +
-  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+# Plot: Eligible counts by race and sex with angled x-axis
+ggplot(general_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
   labs(
-    title = "Average ASVAB Clerical Scores by Race and Gender",
+    title = "General Eligibility Counts (Score ≥ 55) by Race and Sex",
     x = "Race",
-    y = "Average Total Score"
+    y = "Number Eligible",
+    fill = "Sex", 
+    capition = "Graphic by Tiasia Saunders"
   ) +
+  scale_y_continuous(labels = scales::comma) +  
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
-### Combat Score- Combat (CO) – AS, PC, MC, WK
-
-```{r}
-combat_scores <- asvab_clean |> 
-  select(asvab_as, asvab_pc, asvab_mc, asvab_wk, race, sex)
-combat_scores <- combat_scores |>
-  mutate(total_score = (asvab_as + asvab_pc + asvab_mc + asvab_wk))
-print(combat_scores)
-
-```
-
-
-```{r}
-grouped_combat_scores <- combat_scores |> 
-  group_by(race, sex) |> 
-  summarize(
-    mean_total_score = mean(total_score, na.rm = TRUE),
-    total_score_sum = sum(total_score, na.rm = TRUE),
-    count = n(),
-    sd_total_score = sd(total_score, na.rm = TRUE)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
-print(grouped_combat_scores) 
 
 ```
 
-### Electronics (EL) – AR, EI, GS, MK
+### Mechanical: Mechanical Comprehension (MC) + Auto & Shop (AS)
+- Using 47 as the minimum Mechanical (M) composite score: qualifying for roles such as Aircraft Maintenance (2A5X1) and other general mechanical positions.
+
+```{r}
+mechanical_scores <- asvab_clean |> 
+  select(asvab_as, asvab_mc,asvab_ar, race, sex)
+mechanical_scores <- mechanical_scores |>
+  mutate(total_score = (asvab_as +  asvab_mc + asvab_ar))
+print(mechanical_scores)
+
+```
+
+
+
+```{r}
+# Filter for individuals with score >= 47
+eligible_mechanical <- mechanical_scores |>
+  filter(total_score >= 47)
+
+mechanical_grouped_eligible <- eligible_mechanical |>
+  group_by(race, sex) |>
+  summarize(
+    count_eligible = as.numeric(n()))
+
+mechanical_grouped_eligible
+
+```
+
+```{r}
+
+# Plot: Eligible counts by race and sex with angled x-axis
+ggplot(mechanical_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Mechanical Eligibility Counts (Score ≥ 47) by Race and Sex",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex", 
+    capition = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +  
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+
+```
+
+## A	Administrative: Verbal Expression (WK + PC)
+```{r}
+admin_scores <- asvab_clean |> 
+  select(asvab_wk, asvab_pc, race, sex)
+admin_scores <- admin_scores |>
+  mutate(total_score = (asvab_wk + asvab_pc))
+print(admin_scores)
+
+```
+
+
+```{r}
+# Filter for individuals with score >= 55
+eligible_admin <- admin_scores |>
+  filter(total_score >= 55)
+
+admin_grouped_eligible <- eligible_admin |>
+  group_by(race, sex) |>
+  summarize(
+    count_eligible = as.numeric(n()),  
+  )
+
+eligible_admin
+
+```
+
+```{r}
+
+# Plot: Eligible counts by race and sex with angled x-axis
+ggplot(admin_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Administrative Eligibility Counts (Score ≥ 55) by Race and Sex",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex", 
+    capition = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +  
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+
+```
+
+## E	Electronics: EI + AR + MK + GS
+
 ```{r}
 electronics_scores <- asvab_clean |> 
-  select(asvab_ar, asvab_ei, asvab_gs, asvab_mk, race, sex)
+  select(asvab_ei, asvab_ar, asvab_mk, asvab_gs, race, sex)
 electronics_scores <- electronics_scores |>
-  mutate(total_score = (asvab_ar + asvab_ei + asvab_gs + asvab_mk))
+  mutate(total_score = (asvab_ar + asvab_mk + asvab_ei + asvab_gs))
 print(electronics_scores)
-```
-
-### Field Artillery (FA) – AR, MK, MC
-```{r}
-field_artillery_scores <- asvab_clean |> 
-  select(asvab_ar, asvab_mk, asvab_mc, race, sex) 
-field_artillery_scores <- field_artillery_scores |>
-  mutate(total_scores = (asvab_ar + asvab_mk + asvab_mc)) 
-print(field_artillery_scores)
-```
-
-### General Maintenance (GM) – AS, EI, GS, MK
-
-```{r}
-
-general_maintence_scores<- asvab_clean |> 
-  select( asvab_as, asvab_ei, asvab_gs, asvab_mk, race, sex )
-general_maintence_scores <- general_maintence_scores |>
-  mutate(total_score = (asvab_as + asvab_ei + asvab_gs + asvab_mk)) |> 
-print(general_maintence_scores)
-  
 
 ```
 
-### General Technical (GT) -AR, PC, WK
-```{r}
-general_technical_scores <- asvab_clean |> 
-  select(asvab_ar, asvab_pc, asvab_wk, race, sex ) 
-general_technical_scores<- general_technical_scores |> 
-  mutate(total_score = (asvab_ar + asvab_pc + asvab_wk)) |>
-  print(general_technical_scores)
-
-```
-
-### Mechanical Maintenance (MM) – AS, EI, MC
-```{r}
-mechanical_maintence_scores <- asvab_clean |> 
-  select( asvab_as, asvab_ei, asvab_mc, race, sex)
-mechanical_maintence_scores <- mechanical_maintence_scores |>
-  mutate(total_score = (asvab_as + asvab_ei + asvab_mc)) |> 
-  print(mechanical_maintence_scores)
-```
-
-
-Operators and Food (OF) – AS, PC, MC, WK
 
 ```{r}
-operators_food_scores <- asvab_clean |> 
-  select(asvab_as, asvab_pc, asvab_mc, asvab_wk, race, sex)
-operators_food_scores <- operators_food_scores |>
-  mutate(total_score = (asvab_as + asvab_pc + asvab_mc + asvab_wk)) |> 
-  print(operators_food_scores)
+# Filter for individuals with score >= 60
+eligible_electronics <- electronics_scores |>
+  filter(total_score >= 60)
 
-```
-
-### Operators and Food Eligibility (using 85 as the min score because of an online search) 
-```{r}
-# Filter for total_score > 91
-above_85 <- operators_food_scores |> 
-  filter(total_score >= 85)
-
-# Count number of each race above 91
-of_race_counts <- above_85 |> 
-  count(race)
-
-# Plot the counts
-ggplot(of_race_counts, aes(x = race, y = n, fill = race)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Number of Individuals by Race with Total Score >= 85",
-       x = "Race",
-       y = "Count") +
-  theme_minimal() +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 45, hjust = 1)
+electronics_grouped_eligible <- eligible_electronics |>
+  group_by(race, sex) |>
+  summarize(
+    count_eligible = as.numeric(n()),
+    .groups = "drop"
   )
 
+electronics_grouped_eligible
+
+
 ```
 
 
-Surveillance and Communications (SC) – AR, AS, MC, PC, WK
-
 ```{r}
-surveilance_comms_score <- asvab_clean |> 
-  select(asvab_ar, asvab_as, asvab_mc, asvab_pc, asvab_wk, race, sex)
-surveilance_comms_score <- surveilance_comms_score |>
-  mutate(total_score = (asvab_ar + asvab_as + asvab_mc + asvab_pc + asvab_wk)) |> 
-  print(surveilance_comms_score)
-```
-
-
-Skilled Technical (ST) – GS, MK, MC, PC, WK
-
-```{r}
-skilled_technical <- asvab_clean |> 
-  select(asvab_gs, asvab_mk, asvab_mc, asvab_pc, asvab_wk, race, sex) 
-skilled_technical <- skilled_technical |>
-  mutate(total_score = (asvab_gs + asvab_mk + asvab_mc + asvab_pc + asvab_wk)) |> 
-  print(skilled_technical)
-
-```
-
-### Skilled Technican Eligbility (using 91 as the min score because of an online search) 
-
-```{r}
-# Filter for total_score > 91
-above_91 <- skilled_technical |> 
-  filter(total_score >= 91)
-
-# Count number of each race above 91
-st_race_counts <- above_91 |> 
-  count(race)
-
-# Plot the counts
-ggplot(st_race_counts, aes(x = race, y = n, fill = race)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Number of Individuals by Race with Total Score > 91",
-       x = "Race",
-       y = "Count") +
+# Plot: Eligible counts by race and sex with angled x-axis
+ggplot(electronics_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Electronics Eligibility Counts (Score ≥ 60) by Race and Sex",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex", 
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +  
   theme_minimal() +
   theme(
-    legend.position = "none",
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 ```
 
+### Results: 
+
+- The four graphics for the most part show similiar elgibility across all races with almost the same count of people per race that qualify for the positions. This makes sense considering the mininumn elgibility score is similiar ( 55 for General and Admin and 47 for Mechanical and 60 for Electronics)
+
+Different ASVAB subtest sums → but similar high scores + similar cutoff thresholds → similar eligibility counts across composites.
+`
