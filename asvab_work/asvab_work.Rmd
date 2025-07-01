@@ -225,16 +225,17 @@ eligible_general <- general_scores |>
 general_grouped_eligible <- eligible_general |>
   group_by(race, sex) |>
   summarize(
-    count_eligible = as.numeric(n()))
+    count_eligible = as.numeric(n())) |> 
+  arrange(desc(count_eligible))
 
-general_grouped_eligible
+print(general_grouped_eligible)
 
 ```
 
 ```{r}
 
 # Plot: Eligible counts by race and sex with angled x-axis
-ggplot(general_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+g_plot <- ggplot(general_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
     title = "General Eligibility Counts (Score ≥ 55) by Race and Sex",
@@ -249,6 +250,7 @@ ggplot(general_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) 
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
+ggsave("general_eligibility_counts.png", plot = e_plot, width = 12, height = 7, dpi = 300, bg = "white")
 ```
 
 ### Mechanical: Mechanical Comprehension (MC) + Auto & Shop (AS)
@@ -273,16 +275,17 @@ eligible_mechanical <- mechanical_scores |>
 mechanical_grouped_eligible <- eligible_mechanical |>
   group_by(race, sex) |>
   summarize(
-    count_eligible = as.numeric(n()))
+    count_eligible = as.numeric(n())) |> 
+  arrange(desc(count_eligible))
 
-mechanical_grouped_eligible
+print(mechanical_grouped_eligible)
 
 ```
 
 ```{r}
 
 # Plot: Eligible counts by race and sex with angled x-axis
-ggplot(mechanical_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+m_plot <- ggplot(mechanical_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
     title = "Mechanical Eligibility Counts (Score ≥ 47) by Race and Sex",
@@ -297,7 +300,7 @@ ggplot(mechanical_grouped_eligible, aes(x = race, y = count_eligible, fill = sex
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-
+ggsave("mechanical_eligibility_counts.png", plot = m_plot, width = 12, height = 7, dpi = 300, bg = "white")
 
 ```
 
@@ -321,16 +324,17 @@ admin_grouped_eligible <- eligible_admin |>
   group_by(race, sex) |>
   summarize(
     count_eligible = as.numeric(n()),  
-  )
+  ) |>
+  arrange(desc(count_eligible))
 
-eligible_admin
+print(admin_grouped_eligible)
 
 ```
 
 ```{r}
 
 # Plot: Eligible counts by race and sex with angled x-axis
-ggplot(admin_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+a_plot <- ggplot(admin_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
     title = "Administrative Eligibility Counts (Score ≥ 55) by Race and Sex",
@@ -345,7 +349,7 @@ ggplot(admin_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-
+ggsave("admin_eligibility_counts.png", plot = a_plot, width = 12, height = 7, dpi = 300, bg = "white")
 
 ```
 
@@ -371,9 +375,12 @@ electronics_grouped_eligible <- eligible_electronics |>
   summarize(
     count_eligible = as.numeric(n()),
     .groups = "drop"
-  )
+  ) |> 
 
-electronics_grouped_eligible
+    arrange(desc(count_eligible))
+
+
+print(electronics_grouped_eligible)
 
 
 ```
@@ -381,7 +388,7 @@ electronics_grouped_eligible
 
 ```{r}
 # Plot: Eligible counts by race and sex with angled x-axis
-ggplot(electronics_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+ e_plot <- ggplot(electronics_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
     title = "Electronics Eligibility Counts (Score ≥ 60) by Race and Sex",
@@ -395,6 +402,10 @@ ggplot(electronics_grouped_eligible, aes(x = race, y = count_eligible, fill = se
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
+
+# Save to file - adjust width and height (in inches) and dpi as needed
+ggsave("electronics_eligibility_counts.png", plot = e_plot, width = 12, height = 7, dpi = 300, bg = "white")
+
 ```
 
 ### Results: 
@@ -402,4 +413,6 @@ ggplot(electronics_grouped_eligible, aes(x = race, y = count_eligible, fill = se
 - The four graphics for the most part show similiar elgibility across all races with almost the same count of people per race that qualify for the positions. This makes sense considering the mininumn elgibility score is similiar ( 55 for General and Admin and 47 for Mechanical and 60 for Electronics)
 
 Different ASVAB subtest sums → but similar high scores + similar cutoff thresholds → similar eligibility counts across composites.
+
+If you can think of a better way to highlight the disparities in each composite scoring (in the process of researching how to do that) please let me know. But, for the most part for each composite scoring White Americans have high eligility count, followed by Black Americans, then Asian. 
 `
