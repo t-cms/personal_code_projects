@@ -9,6 +9,7 @@ output: html_document
 
 ### PHMSA’s Docket 2019-0091 is an advance notice of proposed rulemaking seeking public input on updating safety regulations for liquefied natural gas (LNG) facilities. The agency aims to modernize outdated rules, incorporate updated industry standards, and address emerging technologies and practices in LNG operations. This process includes evaluating environmental impacts and potential costs and benefits of regulatory changes.
 
+
 ```{r}
 # Load libraries 
 library(tidyverse)
@@ -50,7 +51,8 @@ state_comments <- phmsa_comments %>%
   print(state_comments)
 ```
 
-#### Top 5 states that commented on this docket were the following: CA, NY, FL, PA, and IL. This makes sense considering that CA, PA, and IL are part of the top states that has the most railroads. Addiitonally, PA and TX are a couple of states that produces the most LNG in the US 
+
+- Top 5 states that commented on this docket were the following: CA, NY, FL, PA, and IL. This makes sense considering that CA, PA, and IL are part of the top states that has the most railroads. Addiitonally, PA and TX are a couple of states that produces the most LNG in the US 
 
 ```{r}
 time_comments <- phmsa_comments |> 
@@ -72,7 +74,8 @@ ggplot(time_comments, aes(x = posted_date, y = comment_count)) +
   theme_minimal()
 
 ```
-#### The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments and on 06/20 with 3627 comments. 
+
+- The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments and on 06/20 with 3627 comments. 
 
 
 ## Sentiment Analysis 
@@ -133,7 +136,6 @@ top_twenty_bigrams <- lng_counted_bigrams |>
 
 top_twenty_bigrams
 ```
-----> ### { talk about the top twenty bigrams} < ---- 
 
 ```{r}
 # Combine the bigram into one string for labeling
@@ -153,6 +155,7 @@ ggplot(top_twenty_bigrams, aes(x = reorder(bigrams, n), y = n)) +
   ) +
   theme_minimal()
 ```
+
 - The top five most frequent bigrams are the following: lng export, protect workers, methane gas, lng infrastructure, and pipeline infrastructure. This suggests that the public is concerned about the safety and infrastructure of LNG facilities, as well as the impact on workers. The bigrams also suggest that the public is concerned about the environmental impact of LNG facilities, particularly in relation to methane gas emissions.
 ```{r}
 nrc_sentiments <- get_sentiments("nrc")
@@ -179,10 +182,10 @@ ggplot(overall_sentiment_count, aes(x = sentiment, y = n)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-- The most common sentiment of the comments is positive, suggesting that the public is generally supportive of the proposed amendments to LNG facilities. 
-- The second most common sentiment is negative, indicating that there are some concerns about the proposed amendments. 
-- The third most common sentiment is fear, suggesting that there are some fears about the potential impact of the proposed amendments on LNG facilities. 
-- The fourth common sentiment is trust, indicating that there are some concerns about the trustworthiness of the proposed amendments.
+** The most common sentiment of the comments is positive, suggesting that the public is generally supportive of the proposed amendments to LNG facilities. **
+** The second most common sentiment is negative, indicating that there are some concerns about the proposed amendments. **
+** The third most common sentiment is fear, suggesting that there are some fears about the potential impact of the proposed amendments on LNG facilities. **
+** The fourth common sentiment is trust, indicating that there are some concerns about the trustworthiness of the proposed amendments. **
 
 
 ## Leading Positive, Negative, Fear, and Trust Sentiments 
@@ -238,7 +241,7 @@ sentiments_comments %>%
   labs(
     x = "Sentiment Analysis Breakdown For PHMSA Docket 2019-0091 Comments",
     y = NULL,
-    caption = ".\nGraphic by Tiasia Saunders (redacted - peer review)  07/01/2025"
+    caption = ".\nGraphic by Tiasia Saunders  07/01/2025"
   ) 
 ```
 
@@ -436,11 +439,12 @@ ggplot(vizDataFrame, aes(x = category, y = value, fill = category)) +
   labs(
     title = "Common Narratives in PHMSA Docket 2019-0091 Comments",
     subtitle = "Six probable topics in PHMSA's Amendments to LNG Export Facilities ANPRM. n = 6,943",
-    caption = "\nGraphic by Tiasia Saunders (redacted - peer review) 07/01/2025"
+    caption = "\nGraphic by Tiasia Saunders 07/01/2025"
   )
 ```
 
-### comments Results 
+### Comments Topic Modeling Results: 
+
 - So, the top three topics are: phmsa_terminal_regulation, lng_export_prioritization, and lng_safety_and_labor. This concludes that the majority of the comments are focused on safety regulations, labor issues, and prioritization of LNG exports. The public is worried about the safety of LNG facilities, the impact on workers, and the prioritization of LNG exports over safety concerns.
 
 - The least mentioned topics are: hazardous_materials_admin, pipeline_safety_update, and methane_gas_infrastructure. This suggests that the public is less concerned about the administration of hazardous materials, updates to pipeline safety regulations, and the infrastructure for methane gas.
