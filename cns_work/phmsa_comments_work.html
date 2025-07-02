@@ -368,6 +368,12 @@ rules, incorporate updated industry standards, and address emerging
 technologies and practices in LNG operations. This process includes
 evaluating environmental impacts and potential costs and benefits of
 regulatory changes.</h3>
+</div>
+<div id="everything-is-subject-to-change-once-i-download-the-final-version-of-the-comments-underneath-the-docket-considering-that-the-comment-submission-period-ends-on-0707.-so-then-i-will-redownload-the-new-csv-with-all-the-comments-and-conduct-the-same-analysis-on-them" class="section level3">
+<h3>Everything is subject to change once I download the final version of
+the comments underneath the docket considering that the comment
+submission period ends on 07/07. So, then I will redownload the new csv
+with all the comments and conduct the same analysis on them</h3>
 <pre class="r"><code># Load libraries 
 library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
@@ -434,7 +440,12 @@ library(flextable)</code></pre>
 ## The following object is masked from &#39;package:purrr&#39;:
 ## 
 ##     compose</code></pre>
-<pre class="r"><code>library(rio)</code></pre>
+<pre class="r"><code>library(rio)
+library(spacyr)
+spacy_install()</code></pre>
+<pre><code>## Warning in spacy_install(): Skipping installation. Use `force` to force
+## installation or update. Or use `spacy_download_langmodel()` if you just want to
+## install a model.</code></pre>
 <pre class="r"><code># Load the data
 
 read_csv(&quot;phmsa_2019-0012_comments.csv&quot;) |&gt; 
@@ -499,6 +510,79 @@ TX are a couple of states that produces the most LNG in the US</li>
 comments 06/07 with one comment and started to spike on 06/09 with 2757
 Comments and on 06/20 with 3627 comments.</li>
 </ul>
+<pre class="r"><code>spiked_earlyjune_comments &lt;- phmsa_comments |&gt; 
+  filter(as.character(posted_date) == &quot;2025-06-09 04:00:00&quot;)
+
+spiked_latejune_comments &lt;- phmsa_comments |&gt; 
+  filter(as.character(posted_date) == &quot;2025-06-20 04:00:00&quot;)</code></pre>
+<ul>
+<li><p>So, the 2757 comments on June 06 came from Earthwork’s submission
+box, so the organization must of posted a link to their submission box
+link on their social media to prompt the public to send the automated
+message in to the docket.</p></li>
+<li><p>Same for the 3627 comments on June 20, include a different mass
+message, which I am attempting to find the submission box for it
+now.</p></li>
+</ul>
+</div>
+<div id="comment-differantion" class="section level2">
+<h2>Comment Differantion</h2>
+<pre class="r"><code>different_commentors &lt;- phmsa_comments |&gt; 
+  select(title) |&gt; 
+  count(title, sort = TRUE) </code></pre>
+<pre class="r"><code># People: have both first and last names
+people &lt;- phmsa_comments |&gt; 
+  filter(!is.na(first_name) &amp; first_name != &quot;&quot;,
+         !is.na(last_name) &amp; last_name != &quot;&quot;)
+
+# Organizations: missing either first or last name
+organizations &lt;- phmsa_comments |&gt; 
+  filter(is.na(first_name) | first_name == &quot;&quot; |
+         is.na(last_name) | last_name == &quot;&quot;)</code></pre>
+<div id="organization-submissions-results-analysis" class="section level4">
+<h4>Organization Submissions Results Analysis:</h4>
+<ul>
+<li>Organization Submissions came from two organizations including <a href="https://pstrust.org/">Pipeline Safety Trust</a>, an org dedicating
+to keep communities and environments safe from pipeline hazards and
+RESTORE, <a href="https://chorusfoundation.org/what-we-fund/restore-restore-explicit-symmetry-to-our-ravaged-earth-trust/">Restore
+Explicit Symmetry to our Ravaged Earth</a>, an organization that strive
+to raise public, governmental, and corporate awareness about the
+necessity to return to a sustainable equilibrium.</li>
+<li>It was 8 comments from these orgs with 7 coming from RESTORE and 1
+coming from Pipeline Safety Trust.<br />
+</li>
+<li>The organization commenters strongly emphasize the urgent need to
+revise outdated LNG safety regulations, citing unresolved risks and
+inadequate, secretive modeling that threatens public safety, especially
+in Southwest Louisiana’s LNG terminal zones. They highlight past
+workshops and expert recommendations that PHMSA has yet to fully address
+or make publicly available, including important test results from
+facilities like the LGFSTF. Concerns are raised about transparency, the
+influence of industry-aligned institutions, and the lack of meaningful
+community involvement in the regulatory process. Several comments also
+point to recent reports and real-world risks, including insurance
+companies withdrawing support due to underestimated dangers. Overall,
+they demand that PHMSA prioritize safety, transparency, and
+scientifically validated standards before proceeding with any rule
+revisions.</li>
+</ul>
+<pre class="r"><code>same_message &lt;- phmsa_comments |&gt; 
+  filter(str_detect(comment, fixed(&quot;Dear Director Duffy,&quot;)))</code></pre>
+</div>
+<div id="earthworks-same-message-submissions-analysis" class="section level4">
+<h4>Earthworks Same Message Submissions Analysis:</h4>
+<ul>
+<li><p>The same message came from Earthworks’ submission <a href="https://act.earthworks.org/page/83887/action/1?locale=en-US">link</a>,
+urging PHMSA to update outdated LNG safety regulations to prioritize
+public safety, transparency, and accountability over industry profits.
+It called for strong methane leak standards and input from impacted
+communities to prevent pipeline failures and protect lives.</p></li>
+<li><p>The majority of the comments came from individuals, with 6,935
+comments, with 2957 being the mass message from Earthwork’s submission
+link. This suggests that the public is more concerned about the proposed
+amendments to LNG facilities than organizations are.</p></li>
+</ul>
+</div>
 </div>
 <div id="sentiment-analysis" class="section level2">
 <h2>Sentiment Analysis</h2>
@@ -1026,6 +1110,13 @@ the majority of the comments are focused on safety regulations, labor
 issues, and prioritization of LNG exports. The public is worried about
 the safety of LNG facilities, the impact on workers, and the
 prioritization of LNG exports over safety concerns.</p></li>
+<li><p>Pipeline Safety Trust’s comment included an attachment in which
+they request a 60-day extension of the comment period for PHMSA’s ANPRMS
+Docket 2019-0091 and Docket 2025-0019, citing the need for more time to
+review the complex issues, discuss with stakeholders, and provide
+meaningful input. They emphasize the importance of public safety and the
+need for thorough consideration of the proposed amendments to LNG
+facilities regulations.</p></li>
 <li><p>The least mentioned topics are: hazardous_materials_admin,
 pipeline_safety_update, and methane_gas_infrastructure. This suggests
 that the public is less concerned about the administration of hazardous
