@@ -6,7 +6,6 @@ output: html_document
 ---
 
 ```{r}
-install.packages("pdftools")
 library(pdftools)
 
 ```
@@ -19,7 +18,7 @@ pdf_folder <- "permits_pdf"
 pdf_files <- list.files(pdf_folder, pattern = "\\.pdf$", full.names = TRUE)
 
 # Define the keywords you're searching for
-keywords <- c("LNG", "methane", "natural gas", "liqufied natural gas", "liquified methane", "liquified methane gas", "UN 1972", "1972")
+keywords <- c("LNG", "methane", "natural gas", "liquefied natural gas", "liquefied methane", "liquefied methane gas", "UN 1972", "1972", "LPG")
 
 # Create a data frame to store results
 results <- data.frame(
