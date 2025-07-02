@@ -34,7 +34,6 @@ library(pals)
 library(SnowballC)
 library(flextable)
 library(rio)
-install.packages("spacyr")
 library(spacyr)
 spacy_install()
 
