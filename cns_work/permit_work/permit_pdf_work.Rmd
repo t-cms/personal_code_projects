@@ -1,0 +1,68 @@
+---
+title: "permit_pdf_work"
+author: "Tiasia Saunders"
+date: "2025-07-01"
+output: html_document
+---
+
+```{r}
+install.packages("pdftools")
+library(pdftools)
+
+```
+```{r}
+
+# Define the path to the folder containing the PDFs
+pdf_folder <- "permits_pdf"
+
+# List all PDF files in the folder
+pdf_files <- list.files(pdf_folder, pattern = "\\.pdf$", full.names = TRUE)
+
+# Define the keywords you're searching for
+keywords <- c("LNG", "methane", "natural gas", "liqufied natural gas", "liquified methane", "liquified methane gas", "UN 1972", "1972")
+
+# Create a data frame to store results
+results <- data.frame(
+  file = character(),
+  keyword_found = character(),
+  stringsAsFactors = FALSE
+)
+
+# Loop through each PDF file
+for (pdf_path in pdf_files) {
+  # Try to extract text from the PDF
+  text <- tryCatch(
+    pdf_text(pdf_path),
+    error = function(e) {
+      message(sprintf("Error reading %s: %s", pdf_path, e$message))
+      return(NULL)
+    }
+  )
+  
+  # Skip this file if we couldn’t extract text
+  if (is.null(text)) next
+  
+  # Combine all pages into one string
+  full_text <- paste(text, collapse = " ")
+  
+  # Search for each keyword
+  for (word in keywords) {
+    if (grepl(word, full_text, ignore.case = TRUE)) {
+      # Add to results if keyword is found
+      results <- rbind(results, data.frame(
+        file = basename(pdf_path),
+        keyword_found = word,
+        stringsAsFactors = FALSE
+      ))
+    }
+  }
+}
+
+# Show the first few results
+head(results)
+
+# Optionally write to CSV
+ write.csv(results, "permit_keyword_hits.csv", row.names = FALSE)
+
+```
+
