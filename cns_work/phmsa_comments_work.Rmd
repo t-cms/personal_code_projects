@@ -9,6 +9,8 @@ output: html_document
 
 ### PHMSA’s Docket 2019-0091 is an advance notice of proposed rulemaking seeking public input on updating safety regulations for liquefied natural gas (LNG) facilities. The agency aims to modernize outdated rules, incorporate updated industry standards, and address emerging technologies and practices in LNG operations. This process includes evaluating environmental impacts and potential costs and benefits of regulatory changes.
 
+### Everything is subject to change once I download the final version of the comments underneath the docket considering that the comment submission period ends on 07/07. So, then I will redownload the new csv with all the comments and conduct the same analysis on them 
+
 
 ```{r}
 # Load libraries 
@@ -32,6 +34,9 @@ library(pals)
 library(SnowballC)
 library(flextable)
 library(rio)
+install.packages("spacyr")
+library(spacyr)
+spacy_install()
 
 ```
 
@@ -75,9 +80,61 @@ ggplot(time_comments, aes(x = posted_date, y = comment_count)) +
 
 ```
 
-- The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments and on 06/20 with 3627 comments. 
+- The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments and on 06/20 with 3627 comments.
+
+```{r}
+spiked_earlyjune_comments <- phmsa_comments |> 
+  filter(as.character(posted_date) == "2025-06-09 04:00:00")
+
+spiked_latejune_comments <- phmsa_comments |> 
+  filter(as.character(posted_date) == "2025-06-20 04:00:00")
+```
+
+- So, the 2757 comments on June 06 came from Earthwork's submission box, so the organization must of posted a link to their submission box link on their social media to prompt the public to send the automated message in to the docket. 
+
+- Same for the 3627 comments on June 20, include a different mass message, which I am attempting to find the submission box for it now. 
+
+## Comment Differantion 
+```{r}
+different_commentors <- phmsa_comments |> 
+  select(title) |> 
+  count(title, sort = TRUE) 
+ 
+```
+
+```{r}
+# People: have both first and last names
+people <- phmsa_comments |> 
+  filter(!is.na(first_name) & first_name != "",
+         !is.na(last_name) & last_name != "")
+
+# Organizations: missing either first or last name
+organizations <- phmsa_comments |> 
+  filter(is.na(first_name) | first_name == "" |
+         is.na(last_name) | last_name == "")
+```
+
+#### Organization Submissions Results Analysis: 
+
+- Organization Submissions came from two organizations including [Pipeline Safety Trust](https://pstrust.org/), an org dedicating to keep communities and environments safe from pipeline hazards and RESTORE, [Restore Explicit Symmetry to our Ravaged Earth](https://chorusfoundation.org/what-we-fund/restore-restore-explicit-symmetry-to-our-ravaged-earth-trust/), an organization that strive to raise public, governmental, and corporate awareness about the necessity to return to a sustainable equilibrium. 
+- It was 8 comments from these orgs with 7 coming from RESTORE and 1 coming from Pipeline Safety Trust.  
+- The organization commenters strongly emphasize the urgent need to revise outdated LNG safety regulations, citing unresolved risks and inadequate, secretive modeling that threatens public safety, especially in Southwest Louisiana’s LNG terminal zones. They highlight past workshops and expert recommendations that PHMSA has yet to fully address or make publicly available, including important test results from facilities like the LGFSTF. Concerns are raised about transparency, the influence of industry-aligned institutions, and the lack of meaningful community involvement in the regulatory process. Several comments also point to recent reports and real-world risks, including insurance companies withdrawing support due to underestimated dangers. Overall, they demand that PHMSA prioritize safety, transparency, and scientifically validated standards before proceeding with any rule revisions.
 
 
+
+```{r}
+same_message <- phmsa_comments |> 
+  filter(str_detect(comment, fixed("Dear Director Duffy,")))
+  
+```
+
+#### Earthworks Same Message Submissions Analysis: 
+
+- The same message came from Earthworks' submission [link](https://act.earthworks.org/page/83887/action/1?locale=en-US), urging PHMSA to update outdated LNG safety regulations to prioritize public safety, transparency, and accountability over industry profits. It called for strong methane leak standards and input from impacted communities to prevent pipeline failures and protect lives.
+
+- The majority of the comments came from individuals, with 6,935 comments, with 2957 being the mass message from Earthwork's submission link. This suggests that the public is more concerned about the proposed amendments to LNG facilities than organizations are.
+
+ 
 ## Sentiment Analysis 
 
 ```{r}
@@ -448,6 +505,8 @@ ggplot(vizDataFrame, aes(x = category, y = value, fill = category)) +
 ### Comments Topic Modeling Results: 
 
 - So, the top three topics are: phmsa_terminal_regulation, lng_export_prioritization, and lng_safety_and_labor. This concludes that the majority of the comments are focused on safety regulations, labor issues, and prioritization of LNG exports. The public is worried about the safety of LNG facilities, the impact on workers, and the prioritization of LNG exports over safety concerns.
+
+- Pipeline Safety Trust's comment included an attachment in which they request a 60-day extension of the comment period for PHMSA's ANPRMS Docket 2019-0091 and Docket 2025-0019, citing the need for more time to review the complex issues, discuss with stakeholders, and provide meaningful input. They emphasize the importance of public safety and the need for thorough consideration of the proposed amendments to LNG facilities regulations.
 
 - The least mentioned topics are: hazardous_materials_admin, pipeline_safety_update, and methane_gas_infrastructure. This suggests that the public is less concerned about the administration of hazardous materials, updates to pipeline safety regulations, and the infrastructure for methane gas.
 
