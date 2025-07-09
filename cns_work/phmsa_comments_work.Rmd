@@ -94,7 +94,7 @@ spiked_latejune_comments <- phmsa_comments |>
 
 - Same for the 3627 comments on June 20, include a different mass message, which I am attempting to find the submission box for it now. 
 
--The 297 comments on June 30, include mass comments from Earthworks and the other unknown submission box. 
+- The 297 comments on June 30, include mass comments from Earthworks and the other unknown submission box. 
 
 ## Comment Differantion 
 ```{r}
