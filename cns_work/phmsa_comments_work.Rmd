@@ -9,9 +9,6 @@ output: html_document
 
 ### PHMSA’s Docket 2019-0091 is an advance notice of proposed rulemaking seeking public input on updating safety regulations for liquefied natural gas (LNG) facilities. The agency aims to modernize outdated rules, incorporate updated industry standards, and address emerging technologies and practices in LNG operations. This process includes evaluating environmental impacts and potential costs and benefits of regulatory changes.
 
-### Everything is subject to change once I download the final version of the comments underneath the docket considering that the comment submission period ends on 07/07. So, then I will redownload the new csv with all the comments and conduct the same analysis on them 
-
-
 ```{r}
 # Load libraries 
 library(tidyverse)
@@ -42,12 +39,12 @@ spacy_install()
 ```{r}
 # Load the data
 
-read_csv("phmsa_2019-0012_comments.csv") |> 
+read_csv("phmsa_comments_all.csv") |> 
   clean_names() -> phmsa_comments
 ```
-
+## Leading States by Number of Comments
 ```{r}
-state_comments <- phmsa_comments %>%
+state_comments <- phmsa_comments |> 
   mutate(state_province = ifelse(state_province %in% state.name, 
   state.abb[match(state_province, state.name)], state_province)) |> 
   select(state_province) |> 
@@ -56,7 +53,7 @@ state_comments <- phmsa_comments %>%
 ```
 
 
-- Top 5 states that commented on this docket were the following: CA, NY, FL, PA, and IL. This makes sense considering that CA, PA, and IL are part of the top states that has the most railroads. Addiitonally, PA and TX are a couple of states that produces the most LNG in the US 
+- Top 5 states that commented on this docket were the following: CA, NY, FL, PA, and IL. This makes sense considering that CA, PA, and IL are part of the top states that has the most railroads. Additionally, PA and TX are a couple of states that produces the most LNG in the US. 
 
 ```{r}
 time_comments <- phmsa_comments |> 
@@ -73,25 +70,31 @@ ggplot(time_comments, aes(x = posted_date, y = comment_count)) +
   labs(
     title = "PHMSA LNG Facilities Amendments Comments Over Time",
     x = "Posted Date",
-    y = "Number of Comments"
+    y = "Number of Comments", 
+     caption = ".\nGraphic by Tiasia Saunders 07/08/2025"
   ) +
   theme_minimal()
 
 ```
 
-- The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments and on 06/20 with 3627 comments.
+- The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments, on 06/20 with 3627 comments, and on 06/30 with 297 comments.
 
 ```{r}
 spiked_earlyjune_comments <- phmsa_comments |> 
   filter(as.character(posted_date) == "2025-06-09 04:00:00")
 
-spiked_latejune_comments <- phmsa_comments |> 
+spiked_midjune_comments <- phmsa_comments |> 
   filter(as.character(posted_date) == "2025-06-20 04:00:00")
+
+spiked_latejune_comments <- phmsa_comments |> 
+  filter(as.character(posted_date) == "2025-06-30 04:00:00")
 ```
 
 - So, the 2757 comments on June 06 came from Earthwork's submission box, so the organization must of posted a link to their submission box link on their social media to prompt the public to send the automated message in to the docket. 
 
 - Same for the 3627 comments on June 20, include a different mass message, which I am attempting to find the submission box for it now. 
+
+-The 297 comments on June 30, include mass comments from Earthworks and the other unknown submission box. 
 
 ## Comment Differantion 
 ```{r}
@@ -111,19 +114,25 @@ people <- phmsa_comments |>
 organizations <- phmsa_comments |> 
   filter(is.na(first_name) | first_name == "" |
          is.na(last_name) | last_name == "")
+print(organizations)
 ```
 
 #### Organization Submissions Results Analysis: 
 
-- Organization Submissions came from two organizations including [Pipeline Safety Trust](https://pstrust.org/), an org dedicating to keep communities and environments safe from pipeline hazards and RESTORE, [Restore Explicit Symmetry to our Ravaged Earth](https://chorusfoundation.org/what-we-fund/restore-restore-explicit-symmetry-to-our-ravaged-earth-trust/), an organization that strive to raise public, governmental, and corporate awareness about the necessity to return to a sustainable equilibrium. 
-- It was 8 comments from these orgs with 7 coming from RESTORE and 1 coming from Pipeline Safety Trust.  
-- The organization commenters strongly emphasize the urgent need to revise outdated LNG safety regulations, citing unresolved risks and inadequate, secretive modeling that threatens public safety, especially in Southwest Louisiana’s LNG terminal zones. They highlight past workshops and expert recommendations that PHMSA has yet to fully address or make publicly available, including important test results from facilities like the LGFSTF. Concerns are raised about transparency, the influence of industry-aligned institutions, and the lack of meaningful community involvement in the regulatory process. Several comments also point to recent reports and real-world risks, including insurance companies withdrawing support due to underestimated dangers. Overall, they demand that PHMSA prioritize safety, transparency, and scientifically validated standards before proceeding with any rule revisions.
+- Organization Submissions came from multiple organizations including [Pipeline Safety Trust](https://pstrust.org/), an org dedicating to keep communities and environments safe from pipeline hazards and RESTORE, [Restore Explicit Symmetry to our Ravaged Earth](https://chorusfoundation.org/what-we-fund/restore-restore-explicit-symmetry-to-our-ravaged-earth-trust/), an organization that strive to raise public, governmental, and corporate awareness about the necessity to return to a sustainable equilibrium. 
+- Pipeline Safety Trust's comment included an attachment in which they request a 60-day extension of the comment period for PHMSA's ANPRMS Docket 2019-0091 and Docket 2025-0019, citing the need for more time to review the complex issues, discuss with stakeholders, and provide meaningful input. They emphasize the importance of public safety and the need for thorough consideration of the proposed amendments to LNG facilities regulations.
+- Other organizations include BLUE Engineering and Consulting, GPA Midstream Association, We Act for Environmental Justice, National Association of Pipeline Safety Representatives, Center for Biological Diversity Food & Water Watch, Science and Environmental Health Network, Micah Six Eight Mission, Cheniere Energy, Earthjustice, Environmental Defense Fund, National Grid, Eversource Energy, Sempra Infrastructure Partners, LP, South Texas Environmental Justice Network, American Petroleum Institute, Center for LNG, Interstate Natural Gas Association of America, AGA, APGA, NGA, The Williams Companies, Inc., Pipeline Safety Trust, Southwest Gas Corporation, CH·IV International, GTT North America
+- It was 31 comments from these organizations 
+- The organization commentators strongly emphasize the urgent need to revise outdated LNG safety regulations, citing unresolved risks and inadequate, secretive modeling that threatens public safety, especially in Southwest Louisiana’s LNG terminal zones. They highlight past workshops and expert recommendations that PHMSA has yet to fully address or make publicly available, including important test results from facilities like the LGFSTF. Concerns are raised about transparency, the influence of industry-aligned institutions, and the lack of meaningful community involvement in the regulatory process. Several comments also point to recent reports and real-world risks, including insurance companies withdrawing support due to underestimated dangers. Overall, they demand that PHMSA prioritize safety, transparency, and scientifically validated standards before proceeding with any rule revisions.
 
 
 
 ```{r}
-same_message <- phmsa_comments |> 
+same_earthworks_message <- phmsa_comments |> 
   filter(str_detect(comment, fixed("Dear Director Duffy,")))
+
+same_other_message <- phmsa_comments |> 
+  filter(str_detect(comment, fixed("I am writing,")))
   
 ```
 
@@ -207,7 +216,7 @@ ggplot(top_twenty_bigrams, aes(x = reorder(bigrams, n), y = n)) +
     title = "Top 20 Most Frequent Bigrams",
     x = "Bigrams",
     y = "Frequency", 
-      caption = ".\nGraphic by Tiasia Saunders 06/30/25"
+      caption = ".\nGraphic by Tiasia Saunders 07/08/2025"
   ) +
   theme_minimal()
 ```
@@ -307,6 +316,7 @@ sentiments_comments %>%
 - The top five negative sentiments are: dangerous, leakage, hazardous, government, and reject, which suggests that the public is concerned about the potential dangers and hazards of LNG facilities. The public is also concerned about the government's role in regulating LNG facilities and the potential for LNG facilities to be rejected by the public.
 - The top five fear sentiments are: dangerous, concerned, hazardous, government, and reject, which suggests that the public is concerned about the potential dangers and hazards of LNG facilities. The public is also concerned about the government's role in regulating LNG facilities and the potential for LNG facilities to be rejected by the public.
 - The top five trust sentiments are: effective, strengthening, center, devastating, and safe, which suggests that the public is concerned about the overall effectiveness of the proposed LNG facilities amendments. Additionally, the public is concerned about the potential for LNG facilities to be strengthened and made safer. The public is also concerned about the potential for LNG facilities to be devastating to the environment and the community.
+
 
 ## Topic Modeling 
 
@@ -432,12 +442,12 @@ topics
 # Add categories based on topic keywords
 vizDataFrame <- vizDataFrame |>
   mutate(category = case_when(
-    str_detect(str_squish(variable), "pipelin infrastructur communiti lng safeti seek updat effect gas methan") ~ "pipeline_safety_update",
-    str_detect(str_squish(variable), "safeti lng communiti protect export worker hazard phmsa infrastructur rule") ~ "lng_safety_and_labor",
-    str_detect(str_squish(variable), "safeti lng communiti administr infrastructur phmsa worker pipelin hazard materi") ~ "hazardous_materials_admin",
-    str_detect(str_squish(variable), "pipelin infrastructur communiti lng safeti methan effect seek gas updat") ~ "methane_gas_infrastructure",
-    str_detect(str_squish(variable), "safeti lng communiti export worker protect infrastructur hazard phmsa priorit") ~ "lng_export_prioritization",
-    str_detect(str_squish(variable), "safeti lng communiti protect export worker hazard phmsa infrastructur termin",) ~ "phmsa_terminal_regulation",
+    str_detect(str_squish(variable), "pipelin infrastructur communiti safeti lng seek updat methan effect gas") ~ "pipeline_safety_update",
+    str_detect(str_squish(variable), "lng safeti phmsa regul protect communiti industri standard pipelin requir") ~ "lng_safety_and_labor",
+    str_detect(str_squish(variable), "administr safeti pipelin phmsa materi infrastructur hazard lng communiti worker") ~ "hazardous_materials_admin",
+    str_detect(str_squish(variable), "pipelin infrastructur communiti safeti lng seek methan gas effect updat") ~ "methane_gas_infrastructure",
+    str_detect(str_squish(variable), "safeti lng communiti export protect worker hazard infrastructur phmsa strengthen") ~ "lng_export_prioritization",
+    str_detect(str_squish(variable), "safeti lng communiti export protect worker hazard phmsa infrastructur center",) ~ "phmsa_terminal_regulation",
     TRUE ~ "other"
   ))
 
@@ -461,7 +471,7 @@ topic1 <- theta2 %>%
 ```
 
 ```{r}
-# Assuming `theta` is a dataframe related to DEI topics
+# Assuming `theta` is a dataframe related
 theta2 <- as.data.frame(theta)
 
 phmsa_topic <- theta2 %>%
@@ -481,33 +491,44 @@ head(phmsa_topic$story_id, 20)
 # Now it’s validated for PHMSA topics
 
 ```
+```{r}
+dominantTopics <- vizDataFrame |>
+  group_by(text) |>
+  slice_max(value, n = 1) |>   # Keep only the topic with highest probability
+  ungroup()
 
+```
 
 ```{r}
-ggplot(vizDataFrame, aes(x = category, y = value, fill = category)) + 
+
+dominantTopics |>
+  count(category) |>
+  mutate(proportion = n / sum(n)) |>
+  ggplot(aes(x = category, y = proportion, fill = category)) +
   geom_bar(stat = "identity") +
-  ylab("Proportion") + 
-  scale_fill_manual(
-    values = c("#9933FF", "#33FFFF", "red", "yellow", "darkblue", "lavender" ),
-    name = "Dei Topics"
-  ) + 
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1)
-  ) +
+  ylab("Proportion of Comments") +
   labs(
-    title = "Common Narratives in PHMSA Docket 2019-0091 Comments",
-    subtitle = "Six probable topics in PHMSA's Amendments to LNG Export Facilities ANPRM. n = 6,943",
-    caption = "\nGraphic by Tiasia Saunders 07/01/2025"
-  )
+    title = "Dominant Topics in PHMSA Comments",
+    subtitle = "Based on most probable topic per comment",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_fill_manual(
+    values = c("#9933FF", "#33FFFF", "red", "yellow", "darkblue", "lavender")
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
 ```
+
+
 
 ### Comments Topic Modeling Results: 
 
-- So, the top three topics are: phmsa_terminal_regulation, lng_export_prioritization, and lng_safety_and_labor. This concludes that the majority of the comments are focused on safety regulations, labor issues, and prioritization of LNG exports. The public is worried about the safety of LNG facilities, the impact on workers, and the prioritization of LNG exports over safety concerns.
+- So, the top two topics are: phmsa_terminal_regulation, lng_export_prioritization. This concludes that the majority of the comments are focused on safety regulations and prioritization of LNG exports. The public is worried about the safety of LNG facilities and the prioritization of LNG exports over safety concerns.
 
-- Pipeline Safety Trust's comment included an attachment in which they request a 60-day extension of the comment period for PHMSA's ANPRMS Docket 2019-0091 and Docket 2025-0019, citing the need for more time to review the complex issues, discuss with stakeholders, and provide meaningful input. They emphasize the importance of public safety and the need for thorough consideration of the proposed amendments to LNG facilities regulations.
-
-- The least mentioned topics are: hazardous_materials_admin, pipeline_safety_update, and methane_gas_infrastructure. This suggests that the public is less concerned about the administration of hazardous materials, updates to pipeline safety regulations, and the infrastructure for methane gas.
+- The least mentioned topics are: hazardous_materials_admin, pipeline_safety_update, and methane_gas_infrastructure, and lng_safety_and_labor. This suggests that the public is less concerned about the administration of hazardous materials, updates to pipeline safety regulations, the infrastructure for methane gas, and the safety and labor practices. 
 
 - These results are interesting because they show that the public is most concerned about safety regulations, labor issues, and prioritization of LNG exports, which are all important issues in the LNG industry. The least mentioned topics are less critical to the public, but they are still important for the public to address. 
+
+
 
