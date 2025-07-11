@@ -47,7 +47,7 @@ asvab_clean <- asvab_data %>%
 
 ## Summarizing the data 
   
-  ### Race distribution 
+### Race distribution 
 
 ```{r}
 race_counts <- asvab_clean |> 
@@ -77,7 +77,8 @@ ggplot(gender_count, aes(x = sex, y = n, fill = sex)) +
   theme_minimal()
 
 ```
--- There are 332,846 males and 156518	females, meaning that about 32% percent is represented by females and about 56% percent is represented by males. 
+
+- There are 332,846 males and 156518	females, meaning that about 32% percent is represented by females and about 56% percent is represented by males. 
 
   ### Age distribution 
   
@@ -86,6 +87,7 @@ age_count <- asvab_clean |>
   count(age, sort=TRUE) |> 
   print()
 ```
+ 
   ### Producing age ranges 
 ```{r}
 asvab_clean <- asvab_clean |> 
@@ -123,7 +125,8 @@ ggplot(asvab_clean, aes(x = age_range)) +
 
 
 ```
--- So mostly 16-24 year olds take the ASVAB test followed by the age range 25-34. 
+
+- So mostly 16-24 year olds take the ASVAB test followed by the age range 25-34. 
 
 
 
@@ -180,21 +183,21 @@ ggplot(latest_schooling_by_gender, aes(x = sex, y = count, fill = latest_school_
 
 ### Composite Scores Breakdown 
 
-** The U.S. Air Force does not have a single, universal minimum composite score for any composite score. Instead, it has different minimum scores for various career fields. So, I will be using the min scores for different career fields that fall under each composite score section.  **
+- The U.S. Air Force does not have a single, universal minimum composite score for any composite score. Instead, it has different minimum scores for various career fields. So, I will be using the min scores for different career fields that fall under each composite score section.  
 
-Breakdown of U.S. Air Force Composite Scores: 
+- Breakdown of U.S. Air Force Composite Scores: 
 - G	General: Verbal Expression (WK + PC) + Arithmetic Reasoning (AR)
 - M	Mechanical: Mechanical Comprehension (MC) + Auto & Shop (AS)
 - A	Administrative: Verbal Expression (WK + PC)
 - E	Electronics: EI + AR + MK + GS
 
- G (General) - composite is used for general aptitude jobs that require verbal and math skills.
+- G (General) - composite is used for general aptitude jobs that require verbal and math skills.
 
-M (Mechanical) - focuses on mechanical and technical knowledge.
+- M (Mechanical) - focuses on mechanical and technical knowledge.
 
-A (Administrative) - is for clerical and admin roles, based on verbal skills only.
+- A (Administrative) - is for clerical and admin roles, based on verbal skills only.
 
-E (Electronics) - combines several technical and science-based subtests for electronics and cyber-related roles.
+- E (Electronics) - combines several technical and science-based subtests for electronics and cyber-related roles.
 
 Questions: 
 ** Which gender and which race is more associated with each composite score section? **
@@ -215,6 +218,7 @@ print(general_scores)
 
 
 ### General Eligibility 
+
 - Using 55 as the min score: qualify for roles such as Administrative (A) and Knowledge Operations (3D0X1)) 
 
 ```{r}
