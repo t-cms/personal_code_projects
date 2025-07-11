@@ -228,7 +228,52 @@ general_grouped_eligible <- eligible_general |>
     count_eligible = as.numeric(n())) |> 
   arrange(desc(count_eligible))
 
-print(general_grouped_eligible)
+write.csv(general_grouped_eligible, "general_grouped_eligible.csv", row.names = FALSE)
+
+```
+```{r}
+# Filter for Black and White applicants
+bw_general_data <- general_grouped_eligible |>
+  filter(race %in% c("Black or African American", "White"))
+
+# Plot for Black and White
+ggplot(bw_general_data, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "General Eligibility Counts by Race (Black & White Applicants)",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12, face = "bold")
+  )
+
+```
+
+```{r}
+general_other_races <- general_grouped_eligible |>
+  filter(!race %in% c("Black or African American", "White") & !is.na(race))
+
+g_plot <- ggplot(general_other_races, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "General Eligibility Counts by Race (Other Applicants)",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  coord_flip()
+
+# Save the plot
+ggsave("general_eligibility_counts.png", plot = g_plot, width = 12, height = 7, dpi = 300, bg = "white")
+
 
 ```
 
@@ -252,6 +297,7 @@ g_plot <- ggplot(general_grouped_eligible, aes(x = race, y = count_eligible, fil
 ggsave("general_eligibility_counts.png", plot = g_plot, width = 12, height = 7, dpi = 300, bg = "white")
 
 ```
+
 
 ### Mechanical: Mechanical Comprehension (MC) + Auto & Shop (AS)
 - Using 47 as the minimum Mechanical (M) composite score: qualifying for roles such as Aircraft Maintenance (2A5X1) and other general mechanical positions.
@@ -278,29 +324,53 @@ mechanical_grouped_eligible <- eligible_mechanical |>
     count_eligible = as.numeric(n())) |> 
   arrange(desc(count_eligible))
 
-print(mechanical_grouped_eligible)
+write.csv(mechanical_grouped_eligible, "mechanical_grouped_eligible.csv", row.names = FALSE)
+
+```
+```{r}
+# Filter for Black and White applicants
+bw_mechanical_data <- mechanical_grouped_eligible |>
+  filter(race %in% c("Black or African American", "White"))
+
+# Plot for Black and White
+ggplot(bw_mechanical_data, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Mechanical Eligibility Counts by Race (Black & White Applicants)",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12, face = "bold")
+  )
 
 ```
 
 ```{r}
 
-# Plot: Eligible counts by race and sex with angled x-axis
-m_plot <- ggplot(mechanical_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+mechanical_other_races <- mechanical_grouped_eligible |>
+  filter(!race %in% c("Black or African American", "White") & !is.na(race))
+
+m_plot <- ggplot(mechanical_other_races, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
-    title = "Mechanical Eligibility Counts (Score ≥ 47) by Race and Sex",
+    title = "Mechanical Eligibility Counts by Race (Other Applicants)",
     x = "Race",
     y = "Number Eligible",
-    fill = "Sex", 
-    capition = "Graphic by Tiasia Saunders"
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
   ) +
-  scale_y_continuous(labels = scales::comma) +  
+  scale_y_continuous(labels = scales::comma) +
   theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
+  coord_flip()
 
+# Save the plot
 ggsave("mechanical_eligibility_counts.png", plot = m_plot, width = 12, height = 7, dpi = 300, bg = "white")
+
 
 ```
 
@@ -327,31 +397,57 @@ admin_grouped_eligible <- eligible_admin |>
   ) |>
   arrange(desc(count_eligible))
 
-print(admin_grouped_eligible)
+write.csv(admin_grouped_eligible, "admin_grouped_eligible.csv", row.names = FALSE)
 
 ```
 
 ```{r}
 
-# Plot: Eligible counts by race and sex with angled x-axis
-a_plot <- ggplot(admin_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+# Filter for Black and White applicants
+bw_admin_data <- admin_grouped_eligible |>
+  filter(race %in% c("Black or African American", "White"))
+
+# Plot for Black and White
+ggplot(bw_admin_data, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
-    title = "Administrative Eligibility Counts (Score ≥ 55) by Race and Sex",
+    title = "Admin Eligibility Counts by Race (Black & White Applicants)",
     x = "Race",
     y = "Number Eligible",
-    fill = "Sex", 
-    capition = "Graphic by Tiasia Saunders"
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
   ) +
-  scale_y_continuous(labels = scales::comma) +  
+  scale_y_continuous(labels = scales::comma) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1)
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12, face = "bold")
   )
 
+
+```
+
+```{r}
+admin_other_races <- admin_grouped_eligible |>
+  filter(!race %in% c("Black or African American", "White") & !is.na(race))
+
+a_plot <- ggplot(admin_other_races, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Admin Eligibility Counts by Race (Other Applicants)",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  coord_flip()
+
+# Save the plot
 ggsave("admin_eligibility_counts.png", plot = a_plot, width = 12, height = 7, dpi = 300, bg = "white")
 
 ```
+
 
 ## E	Electronics: EI + AR + MK + GS
 
@@ -380,39 +476,68 @@ electronics_grouped_eligible <- eligible_electronics |>
     arrange(desc(count_eligible))
 
 
-print(electronics_grouped_eligible)
+write.csv(electronics_grouped_eligible, "electronics_grouped_eligible.csv", row.names = FALSE)
+
 
 
 ```
 
 
 ```{r}
-# Plot: Eligible counts by race and sex with angled x-axis
- e_plot <- ggplot(electronics_grouped_eligible, aes(x = race, y = count_eligible, fill = sex)) +
+bw_electronics_data <- electronics_grouped_eligible |>
+  filter(race %in% c("Black or African American", "White"))
+
+# Plot for Black and White
+ggplot(bw_electronics_data, aes(x = race, y = count_eligible, fill = sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
-    title = "Electronics Eligibility Counts (Score ≥ 60) by Race and Sex",
+    title = "Electronics Eligibility Counts by Race (Black & White Applicants)",
     x = "Race",
     y = "Number Eligible",
-    fill = "Sex", 
+    fill = "Sex",
     caption = "Graphic by Tiasia Saunders"
   ) +
-  scale_y_continuous(labels = scales::comma) +  
+  scale_y_continuous(labels = scales::comma) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12, face = "bold")
+)
 
-# Save to file - adjust width and height (in inches) and dpi as needed
+
+```
+
+
+```{r}
+electronics_other_races <- electronics_grouped_eligible |>
+  filter(!race %in% c("Black or African American", "White") & !is.na(race))
+
+e_plot <- ggplot(electronics_other_races, aes(x = race, y = count_eligible, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Electronics Eligibility Counts by Race (Other Applicants)",
+    x = "Race",
+    y = "Number Eligible",
+    fill = "Sex",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  coord_flip()
+
 ggsave("electronics_eligibility_counts.png", plot = e_plot, width = 12, height = 7, dpi = 300, bg = "white")
+
 
 ```
 
 ### Results: 
 
-- The four graphics for the most part show similiar elgibility across all races with almost the same count of people per race that qualify for the positions. This makes sense considering the mininumn elgibility score is similiar ( 55 for General and Admin and 47 for Mechanical and 60 for Electronics)
+- The four graphics for the most part show similar eligibility across all races with almost the same count of people per race that qualify for the positions. This makes sense considering the minimum eligibility score is similar ( 55 for General and Admin and 47 for Mechanical and 60 for Electronics)
 
-Different ASVAB subtest sums → but similar high scores + similar cutoff thresholds → similar eligibility counts across composites.
+- The four graphics show similar eligibility patterns across racial groups, with relatively comparable numbers of people qualifying for each Air Force occupational area. This is likely because, despite differences in the specific ASVAB sub-tests used for each composite score, the cutoff thresholds (55 for General and Admin, 47 for Mechanical, and 60 for Electronics) are fairly similar and target a comparable range of high-scoring individuals.
 
-If you can think of a better way to highlight the disparities in each composite scoring (in the process of researching how to do that) please let me know. But, for the most part for each composite scoring White Americans have high eligility count, followed by Black Americans, then Asian. 
+In other words, while each occupational area uses a different combination of sub-test scores, the overall difficulty and percentile requirement are close enough that they select similarly sized pools of eligible applicants across race and gender.
+
+- Different ASVAB sub-test sums → but similar high scores + similar cutoff thresholds → similar eligibility counts across composites.
+
+- If you can think of a better way to highlight the disparities in each composite scoring (in the process of researching how to do that) please let me know. But, for the most part for each composite scoring White Americans have high eligibility count, followed by Black Americans, then Asian. 
 `

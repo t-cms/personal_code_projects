@@ -1,0 +1,73 @@
+"race","sex","count_eligible"
+"White","Male",132761
+NA,"Male",108470
+NA,"Female",60655
+"Black or African American","Male",52774
+"White","Female",46727
+"Black or African American","Female",31694
+"Asian","Male",12729
+"Asian","Female",5520
+"Black or African American, White","Male",4686
+"Native Hawaiian or Other Pacific Islander","Male",3389
+"American Indian/Alaska Native","Male",2824
+"Asian, White","Male",2627
+"Black or African American, White","Female",2231
+"Native Hawaiian or Other Pacific Islander","Female",1880
+"American Indian/Alaska Native","Female",1461
+"American Indian/Alaska Native, White","Male",1372
+"Asian, White","Female",936
+"Asian, Native Hawaiian or Other Pacific Islander","Male",674
+"Identification Pending","Male",670
+"Asian, Black or African American","Male",653
+"American Indian/Alaska Native, White","Female",552
+"Native Hawaiian or Other Pacific Islander, White","Male",550
+"American Indian/Alaska Native, Black or African American","Male",544
+"Asian, Native Hawaiian or Other Pacific Islander, White","Male",411
+"American Indian/Alaska Native, Black or African American, White","Male",325
+"Asian, Black or African American","Female",325
+"Asian, Native Hawaiian or Other Pacific Islander","Female",302
+"Identification Pending","Female",292
+"Black or African American, Native Hawaiian or Other Pacific Islander","Male",249
+"American Indian/Alaska Native, Black or African American","Female",244
+"Asian, Black or African American, White","Male",219
+"Native Hawaiian or Other Pacific Islander, White","Female",219
+"American Indian/Alaska Native, Black or African American, White","Female",157
+"Black or African American, Native Hawaiian or Other Pacific Islander","Female",152
+"Asian, Native Hawaiian or Other Pacific Islander, White","Female",144
+"Asian, Black or African American, White","Female",127
+"American Indian/Alaska Native, Asian, White","Male",89
+"Black or African American, Native Hawaiian or Other Pacific Islander, White","Male",66
+"American Indian/Alaska Native, Asian","Male",56
+"American Indian/Alaska Native, Asian, Black or African American, Native Hawaiian or Other Pacific Islander, White","Male",46
+"American Indian/Alaska Native, Native Hawaiian or Other Pacific Islander","Male",42
+"American Indian/Alaska Native, Asian, Black or African American, White","Male",41
+"Asian, Black or African American, Native Hawaiian or Other Pacific Islander","Male",38
+"American Indian/Alaska Native, Asian, Native Hawaiian or Other Pacific Islander, White","Male",31
+"Asian, Black or African American, Native Hawaiian or Other Pacific Islander","Female",28
+"Black or African American, Native Hawaiian or Other Pacific Islander, White","Female",28
+"American Indian/Alaska Native, Native Hawaiian or Other Pacific Islander, White","Male",27
+"Asian, Black or African American, Native Hawaiian or Other Pacific Islander, White","Male",26
+"American Indian/Alaska Native, Asian","Female",22
+"Asian, Black or African American, Native Hawaiian or Other Pacific Islander, White","Female",22
+"American Indian/Alaska Native, Asian, Black or African American","Male",21
+"American Indian/Alaska Native, Native Hawaiian or Other Pacific Islander","Female",21
+"American Indian/Alaska Native, Asian, Black or African American","Female",20
+"American Indian/Alaska Native, Asian, Black or African American, White","Female",17
+"American Indian/Alaska Native, Asian, White","Female",16
+"American Indian/Alaska Native, Black or African American, Native Hawaiian or Other Pacific Islander","Female",16
+"American Indian/Alaska Native, Black or African American, Native Hawaiian or Other Pacific Islander, White","Male",16
+"American Indian/Alaska Native, Black or African American, Native Hawaiian or Other Pacific Islander","Male",14
+"Declined to Respond","Male",13
+"American Indian/Alaska Native, Asian, Native Hawaiian or Other Pacific Islander","Female",11
+"American Indian/Alaska Native, Asian, Native Hawaiian or Other Pacific Islander","Male",11
+"American Indian/Alaska Native, Asian, Native Hawaiian or Other Pacific Islander, White","Female",11
+"American Indian/Alaska Native, Black or African American, Native Hawaiian or Other Pacific Islander, White","Female",11
+"Declined to Respond","Female",11
+"American Indian/Alaska Native, Asian, Black or African American, Native Hawaiian or Other Pacific Islander, White","Female",9
+NA,NA,9
+"American Indian/Alaska Native, Native Hawaiian or Other Pacific Islander, White","Female",8
+"White",NA,5
+"American Indian/Alaska Native, Asian, Black or African American, Native Hawaiian or Other Pacific Islander","Male",4
+"Black or African American",NA,2
+"American Indian/Alaska Native, Asian, Black or African American, Native Hawaiian or Other Pacific Islander","Female",1
+"Identification Pending",NA,1
