@@ -6,6 +6,14 @@ output:
   html_document: default
   pdf_document: default
 ---
+
+### ASVAB Test Demographics Analysis 
+
+##### The ASVAB test is a standardized test used by the U.S. military to assess the skills and abilities of potential recruits. It covers a range of subjects, including mathematics, verbal skills, and technical knowledge. The test is designed to help determine an individual's suitability for various military occupations.
+
+##### This analysis will focus on the race, age, and gender demographics of the ASVAB applicants. Additonally, this analyis will focus on the U.S. Air Force Eligility by race focused on the four composite scores: General, Mechanical, Administrative, and Electronics.
+
+
   
 ```{r}
 # load libraries  

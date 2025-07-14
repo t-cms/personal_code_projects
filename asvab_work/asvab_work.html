@@ -357,6 +357,20 @@ display: none;
 </div>
 
 
+<div id="asvab-test-demographics-analysis" class="section level3">
+<h3>ASVAB Test Demographics Analysis</h3>
+<div id="the-asvab-test-is-a-standardized-test-used-by-the-u.s.-military-to-assess-the-skills-and-abilities-of-potential-recruits.-it-covers-a-range-of-subjects-including-mathematics-verbal-skills-and-technical-knowledge.-the-test-is-designed-to-help-determine-an-individuals-suitability-for-various-military-occupations." class="section level5">
+<h5>The ASVAB test is a standardized test used by the U.S. military to
+assess the skills and abilities of potential recruits. It covers a range
+of subjects, including mathematics, verbal skills, and technical
+knowledge. The test is designed to help determine an individual’s
+suitability for various military occupations.</h5>
+</div>
+<div id="this-analysis-will-focus-on-the-race-age-and-gender-demographics-of-the-asvab-applicants.-additonally-this-analyis-will-focus-on-the-u.s.-air-force-eligility-by-race-focused-on-the-four-composite-scores-general-mechanical-administrative-and-electronics." class="section level5">
+<h5>This analysis will focus on the race, age, and gender demographics
+of the ASVAB applicants. Additonally, this analyis will focus on the
+U.S. Air Force Eligility by race focused on the four composite scores:
+General, Mechanical, Administrative, and Electronics.</h5>
 <pre class="r"><code># load libraries  
 library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
@@ -402,6 +416,8 @@ asvab_clean &lt;- asvab_data %&gt;%
   mutate(across(where(is.character), ~ na_if(., &quot;&quot;))) %&gt;%
   mutate(across(where(is.character), ~ na_if(., &quot;N/A&quot;))) %&gt;%
   mutate(across(where(is.character), ~ na_if(., &quot;Unknown&quot;))) </code></pre>
+</div>
+</div>
 <div id="summarizing-the-data" class="section level2">
 <h2>Summarizing the data</h2>
 <div id="race-distribution" class="section level3">
