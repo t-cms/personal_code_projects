@@ -1,0 +1,73 @@
+---
+title: "kaggle"
+author: "Tiasia Saunders"
+date: "2025-07-21"
+output: html_document
+---
+
+
+```{r}
+# Load necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+# Load the dataset
+netflix_tv_movies <- read_csv("netflix_tv_movies.csv")
+```
+
+
+
+How many movies? How many shows?
+
+```{r}
+netflix_tv_movies |> 
+  count(type)
+
+```
+- There are 3407 movies and 1876 shows 
+
+
+What are the top 5 movies with the most run times?
+
+```{r}
+netflix_tv_movies |> 
+  select(runtime, type, title) |>
+  filter(type == "MOVIE") |> 
+  arrange(desc(runtime)) |> 
+  slice(1:5) 
+
+
+
+```
+- The top 5 movies with the longest runttimes are No Longer Kid, Once Upon a Time in America, A Lion in the House, Lagaan:Once Upon a Time in India, and Jodhaa Akbar. 
+
+
+What year did the movie release?
+What is the breakdown of the age certification ratings for the entire dataset?
+```{r}
+netflix_tv_movies |> 
+  count(age_certification)
+
+```
+
+What are the age certifications of the top 10 highest rated content?
+What type of content receive the highest imdb scores?
+```{r}
+netflix_tv_movies |> 
+  select(age_certification, title, imdb_score) |>
+  arrange(desc(imdb_score)) |> 
+   slice(1:10)
+
+```
+
+
+
+Don't think we can answer the following questions considering there is no genre listed in the table and we can't do by year since it doesn't have the year that Netflix put it on their platform, instaed they just have the relased_year for when the movie came out.  
+
+What genre dominates Netflix content by year?
+Has the imdb rating for Netflix content reduced by year?
+

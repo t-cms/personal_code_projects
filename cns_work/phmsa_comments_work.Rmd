@@ -42,6 +42,7 @@ spacy_install()
 read_csv("phmsa_comments_all.csv") |> 
   clean_names() -> phmsa_comments
 ```
+
 ## Leading States by Number of Comments
 ```{r}
 state_comments <- phmsa_comments |> 
@@ -78,6 +79,13 @@ ggplot(time_comments, aes(x = posted_date, y = comment_count)) +
 ```
 
 - The docket was published on 05/05/25 and it started receiving comments 06/07 with one comment and started to spike on 06/09 with 2757 Comments, on 06/20 with 3627 comments, and on 06/30 with 297 comments.
+
+
+```{r}
+week_before_comments_closed <- phmsa_comments |> 
+  filter(posted_date >= "2025-07-01")
+```
+
 
 ```{r}
 spiked_earlyjune_comments <- phmsa_comments |> 
