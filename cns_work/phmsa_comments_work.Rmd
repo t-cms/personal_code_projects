@@ -39,7 +39,7 @@ spacy_install()
 ```{r}
 # Load the data
 
-read_csv("phmsa_comments_all.csv") |> 
+read_csv("phmsa_comments_all_.csv") |> 
   clean_names() -> phmsa_comments
 ```
 
@@ -537,6 +537,72 @@ dominantTopics |>
 - The least mentioned topics are: hazardous_materials_admin, pipeline_safety_update, and methane_gas_infrastructure, and lng_safety_and_labor. This suggests that the public is less concerned about the administration of hazardous materials, updates to pipeline safety regulations, the infrastructure for methane gas, and the safety and labor practices. 
 
 - These results are interesting because they show that the public is most concerned about safety regulations, labor issues, and prioritization of LNG exports, which are all important issues in the LNG industry. The least mentioned topics are less critical to the public, but they are still important for the public to address. 
+
+
+#  PHMSA Docket 2025-0032: Hazardous Materials: Mandatory Regulatory Reviews To Unleash American Energy and Improve Government Efficiency Analysis 
+
+## This is a preliminary analysis until the docket comments end on 08/04
+
+
+```{r}
+read_csv("phmsa_2025_0032.csv") |> 
+  clean_names() -> phmsa_2025_0032_comments
+
+```
+
+```{r}
+state_2025_0032_comments <- phmsa_2025_0032_comments |> 
+  mutate(state_province = ifelse(state_province %in% state.name, 
+  state.abb[match(state_province, state.name)], state_province)) |> 
+  select(state_province) |> 
+  count(state_province, sort = TRUE) 
+  print(state_2025_0032_comments)
+
+```
+
+```{r}
+time_2025_0032_comments <- phmsa_2025_0032_comments |> 
+ select(posted_date, title) |> 
+  group_by(posted_date) |> 
+  summarize(comment_count = n())
+```
+
+## Graphic of Comments Timeline 
+```{r}
+ggplot(time_2025_0032_comments, aes(x = posted_date, y = comment_count)) +
+  geom_line(size = 1) +
+  labs(
+    title = "PHMSA Docket 2025 0032 Comments Over Time",
+    x = "Posted Date",
+    y = "Number of Comments", 
+     caption = ".\nGraphic by Tiasia Saunders 07/28/2025"
+  ) +
+  theme_minimal()
+
+```
+
+
+## People versus Organizations 
+```{r}
+# People: have both first and last names
+people_2025_0032 <- phmsa_2025_0032_comments |> 
+  filter(!is.na(first_name) & first_name != "",
+         !is.na(last_name) & last_name != "")
+
+# Organizations: missing either first or last name
+organizations_2025_0032 <- phmsa_2025_0032_comments |> 
+  filter(is.na(first_name) | first_name == "" |
+         is.na(last_name) | last_name == "")
+print(organizations)
+
+```
+
+
+### As of now, there are only 2 organizations listed in the PHMSA 2025-0032 docket comments. They are the following: Nuclear Energy Institute and the Naval Nuclear Laboratory. Below will be a summarization of what they entail. 
+
+- Nuclear Energy Institute: Doesn't mention anything in regards to LNG, supports PHMSA 
+- Naval Nuclear Lab: Doesn't mention anything in regards to LNG, supports PHMSA 
+
 
 
 

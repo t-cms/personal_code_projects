@@ -19,8 +19,6 @@ library(dplyr)
 netflix_tv_movies <- read_csv("netflix_tv_movies.csv")
 ```
 
-
-
 How many movies? How many shows?
 
 ```{r}
@@ -32,10 +30,11 @@ netflix_tv_movies |>
 
 
 What are the top 5 movies with the most run times?
+What year did the movie release?
 
 ```{r}
 netflix_tv_movies |> 
-  select(runtime, type, title) |>
+  select(runtime, type, title, release_year) |>
   filter(type == "MOVIE") |> 
   arrange(desc(runtime)) |> 
   slice(1:5) 
@@ -45,8 +44,6 @@ netflix_tv_movies |>
 ```
 - The top 5 movies with the longest runttimes are No Longer Kid, Once Upon a Time in America, A Lion in the House, Lagaan:Once Upon a Time in India, and Jodhaa Akbar. 
 
-
-What year did the movie release?
 What is the breakdown of the age certification ratings for the entire dataset?
 ```{r}
 netflix_tv_movies |> 
@@ -57,17 +54,48 @@ netflix_tv_movies |>
 What are the age certifications of the top 10 highest rated content?
 What type of content receive the highest imdb scores?
 ```{r}
-netflix_tv_movies |> 
+  netflix_tv_movies |> 
   select(age_certification, title, imdb_score) |>
   arrange(desc(imdb_score)) |> 
    slice(1:10)
 
 ```
 
-
-
 Don't think we can answer the following questions considering there is no genre listed in the table and we can't do by year since it doesn't have the year that Netflix put it on their platform, instaed they just have the relased_year for when the movie came out.  
 
 What genre dominates Netflix content by year?
 Has the imdb rating for Netflix content reduced by year?
+
+
+
+New Questions: 
+- Make a bar chart of the top 10 imdb shows
+
+```{r}
+top_ten_movies <- netflix_tv_movies |> 
+  select(title, type, imdb_score) |> 
+  filter(type == "MOVIE") |> 
+  arrange(desc(imdb_score)) |> 
+  slice(1:10)
+```
+
+
+```{r}
+ggplot(netflix_tv_movies, aes(x = title, y = imdb_score)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Domestic vs International Coverage Over Time",
+    x = "Publication Date",
+    y = "Number of Articles",
+    color = "Outlet Type", 
+    caption = ".\nGraphic by Tiasia Saunders (redacted - peer review)  05/11/2025"
+  ) +
+  theme_minimal()
+
+
+```
+
+- What are all the movies/shows released in 1993?
+- Make a word chart of the top 10 imdb shows descriptions? 
+- What are the top imdb shows with an R rating? 
 
