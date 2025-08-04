@@ -1,0 +1,157 @@
+---
+title: "npdb_work"
+author: "Tiasia Saunders"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## NPDB Data Analysis 
+
+#### The NPDB is the National Practitioner Data Bank, which is a repository of reports on healthcare practitioners, including adverse actions and medical malpractice payments. 
+
+#### Analysis Purpose: Through this analysis, we will explore the NPDB data to identify trends and patterns in adverse actions and medical malpractice reports across different states. 
+
+
+Data Limitations: 
+- For this analysis, I downloaded two datasets from the NPDB website: 
+  - The first dataset contains state-level data on adverse actions and medical malpractice reports from 2020- March 31st, 2025. 
+  - The second dataset contains yearly reports from 2015 to March 2025 of adverse actions and medical malpractice reports combined by state.
+
+
+```{r}
+library(tidyverse)
+library(tidycensus)
+library(dplyr)
+library(janitor)
+library(ggplot2)
+```
+
+```{r}
+## loading data 
+ npdb_state_data <- read_csv("npdb_state_record.csv") |> 
+  clean_names()
+ yearly_reports_data <- read_csv("yearly_reports.csv") |>
+  clean_names()
+```
+
+
+Questions: 
+1. What are the top 5 states with the most adverse action reports? 
+2. What are the top 5 states with the most medical malpractice report? 
+3. Do a timeline of the reports for the top states? 
+4. What are the 5 top states with the least amount of reports as a whole (look at yearly_reports_data)? 
+
+
+
+```{r}
+top_adverse_states <- npdb_state_data |> 
+  select(state, adverse_action_report) |> 
+  arrange(desc(adverse_action_report)) |> 
+  slice(2:6)
+```
+- The top 5 states that have the highest adverse action reports are the following: California, Texas, Florida, Ohio and Michigan 
+
+## A bar chart of the top 5 states by Adverse Action Reports 
+```{r}
+top_adverse_states |> 
+ggplot(aes(x = reorder(state, adverse_action_report), 
+             y = adverse_action_report)) +
+  geom_col(fill = "#2c3e50") +  
+  coord_flip() +
+  labs(
+    title = "Top 5 States by Adverse Action Reports",
+    x = "State",
+    y = "Adverse Action Reports"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+top_malpractice_states <- npdb_state_data |> 
+  select(state, medical_malpractice_payment_report) |> 
+  arrange(desc(medical_malpractice_payment_report)) |> 
+  slice(2:6)
+```
+
+- A bar chart of the top 5 states with Medical Malpractice Reports 
+```{r}
+top_malpractice_states |> 
+ggplot(aes(x = reorder(state, medical_malpractice_payment_report), 
+             y = medical_malpractice_payment_report)) +
+  geom_col(fill = "lavender") +  
+  coord_flip() +  
+  labs(
+    title = "Top 5 States by Medical Malpractice Reports",
+    x = "State",
+    y = "Medical Malpractice Reports"
+  ) +
+  theme_minimal()
+
+```
+
+- The top 5 states that have the highest medical malpractice payment reports are the following: New York, Florida, California, Pennsylvania and Texas 
+
+- The states that are the occur on both lists are the following: California, Texas, and Florida  
+
+### The top five states combining both type of reports 
+
+```{r}
+top_states_combined <- npdb_state_data |> 
+  select(state, total) |> 
+  arrange(desc(total)) |> 
+  slice(2:6)
+
+```
+
+
+```{r}
+top_states_combined|> 
+ggplot(aes(x = reorder(state,total), 
+             y = total)) +
+  geom_col(fill = "red") +  
+  coord_flip() +  
+  labs(
+    title = "Top 5 States Combining Adverse and Malpractice Reports",
+    x = "State",
+    y = "Combined Reports"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+```{r}
+# Filter for California, Florida, and Texas
+top_states <- yearly_reports_data |> 
+  filter(state %in% c("California", "Florida", "Texas")) |> 
+  select(-total)  # Remove 'Total' column
+
+# Reshape from wide to long format
+top_states <- top_states |> 
+  pivot_longer(
+    cols = starts_with("year_"),
+    names_to = "Year",
+    values_to = "Count"
+  ) |> 
+  mutate(
+    Year = as.numeric(str_remove(Year, "year_"))  # Extract just the year number
+  )
+```
+
+
+```{r}
+ggplot(top_states, aes(x = Year, y = Count, color = state)) +
+  geom_line(size = 1.2) +
+  labs(
+    title = "Trends in Yearly Counts for Selected States",
+    x = "Year",
+    y = "Count",
+    color = "State"
+  ) +
+  theme_minimal()
+```
+
+
+- I plan to continue to do analysis on the NPDB data to identify trends and patterns in adverse actions and medical malpractice reports across different states. 

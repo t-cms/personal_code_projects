@@ -12,11 +12,14 @@ output: html_document
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
+library(janitor)
 ```
 
 ```{r}
 # Load the dataset
 netflix_tv_movies <- read_csv("netflix_tv_movies.csv")
+mental_health <- read_csv("mental_health.csv")  |>
+  clean_names()
 ```
 
 How many movies? How many shows?
@@ -98,4 +101,53 @@ ggplot(netflix_tv_movies, aes(x = title, y = imdb_score)) +
 - What are all the movies/shows released in 1993?
 - Make a word chart of the top 10 imdb shows descriptions? 
 - What are the top imdb shows with an R rating? 
+
+
+## Mental Health stuff 
+
+Basic Questions: 
+1. What is the gender count in this dataset? 
+2. What are the top 5 professions listed in this data? 
+3. What is the breakdown of working student or professional? 
+4. 
+
+```{r}
+gender_breakdown <- mental_health |> 
+  count(gender)
+print(gender_breakdown)
+
+```
+- There are 42,538 females and 51,262 males in this data 
+
+
+```{r}
+top_professions <- mental_health |> 
+  count(profession) |> 
+  arrange(desc(n)) |>
+  slice(1:6)
+print(top_professions)
+
+```
+
+- So, the top five professions are N/A, Teacher with 16,385, Content Writer with 5,187, Architect with 2,982, Consultant with 2920, and Pharmacist with 2656. 
+
+
+```{r}
+mental_health |> 
+  count(working_professional_or_student)
+```
+- There are 18,772 students and 75,028 working professionals in this data. 
+
+What are the dietary habits for students 
+
+```{r}
+mental_health |> 
+  select(profession, dietary_habits) |> 
+  filter(profession == "Student") 
+
+
+```
+
+
+
 
