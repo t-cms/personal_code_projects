@@ -36,6 +36,7 @@ library(ggplot2)
 
 
 Questions: 
+
 1. What are the top 5 states with the most adverse action reports? 
 2. What are the top 5 states with the most medical malpractice report? 
 3. Do a timeline of the reports for the top states? 
