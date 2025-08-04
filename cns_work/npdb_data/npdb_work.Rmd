@@ -52,7 +52,6 @@ top_adverse_states <- npdb_state_data |>
 
 - The top 5 states that have the highest adverse action reports are the following: California, Texas, Florida, Ohio and Michigan 
 
-## A bar chart of the top 5 states by Adverse Action Reports 
 ```{r}
 top_adverse_states |> 
 ggplot(aes(x = reorder(state, adverse_action_report), 
@@ -75,7 +74,7 @@ top_malpractice_states <- npdb_state_data |>
   slice(2:6)
 ```
 
-### A bar chart of the top 5 states with Medical Malpractice Reports 
+
 ```{r}
 top_malpractice_states |> 
 ggplot(aes(x = reorder(state, medical_malpractice_payment_report), 
@@ -95,7 +94,6 @@ ggplot(aes(x = reorder(state, medical_malpractice_payment_report),
 
 - The states that are the occur on both lists are the following: California, Texas, and Florida  
 
-### The top five states combining both type of reports 
 
 ```{r}
 top_states_combined <- npdb_state_data |> 
@@ -105,7 +103,7 @@ top_states_combined <- npdb_state_data |>
 
 ```
 
-### A bar chart of the top 5 states combining both types of reports
+
 ```{r}
 top_states_combined|> 
 ggplot(aes(x = reorder(state,total), 
@@ -141,7 +139,7 @@ top_states <- top_states |>
   )
 ```
 
-### A line chart of the trends in yearly counts for the top states
+
 ```{r}
 ggplot(top_states, aes(x = Year, y = Count, color = state)) +
   geom_line(size = 1.2) +

@@ -440,11 +440,6 @@ whole (look at yearly_reports_data)?</li>
 <li>The top 5 states that have the highest adverse action reports are
 the following: California, Texas, Florida, Ohio and Michigan</li>
 </ul>
-</div>
-</div>
-</div>
-<div id="a-bar-chart-of-the-top-5-states-by-adverse-action-reports" class="section level2">
-<h2>A bar chart of the top 5 states by Adverse Action Reports</h2>
 <pre class="r"><code>top_adverse_states |&gt; 
 ggplot(aes(x = reorder(state, adverse_action_report), 
              y = adverse_action_report)) +
@@ -461,9 +456,6 @@ ggplot(aes(x = reorder(state, adverse_action_report),
   select(state, medical_malpractice_payment_report) |&gt; 
   arrange(desc(medical_malpractice_payment_report)) |&gt; 
   slice(2:6)</code></pre>
-<div id="a-bar-chart-of-the-top-5-states-with-medical-malpractice-reports" class="section level3">
-<h3>A bar chart of the top 5 states with Medical Malpractice
-Reports</h3>
 <pre class="r"><code>top_malpractice_states |&gt; 
 ggplot(aes(x = reorder(state, medical_malpractice_payment_report), 
              y = medical_malpractice_payment_report)) +
@@ -483,16 +475,10 @@ Pennsylvania and Texas</p></li>
 <li><p>The states that are the occur on both lists are the following:
 California, Texas, and Florida</p></li>
 </ul>
-</div>
-<div id="the-top-five-states-combining-both-type-of-reports" class="section level3">
-<h3>The top five states combining both type of reports</h3>
 <pre class="r"><code>top_states_combined &lt;- npdb_state_data |&gt; 
   select(state, total) |&gt; 
   arrange(desc(total)) |&gt; 
   slice(2:6)</code></pre>
-</div>
-<div id="a-bar-chart-of-the-top-5-states-combining-both-types-of-reports" class="section level3">
-<h3>A bar chart of the top 5 states combining both types of reports</h3>
 <pre class="r"><code>top_states_combined|&gt; 
 ggplot(aes(x = reorder(state,total), 
              y = total)) +
@@ -520,9 +506,6 @@ top_states &lt;- top_states |&gt;
   mutate(
     Year = as.numeric(str_remove(Year, &quot;year_&quot;))  # Extract just the year number
   )</code></pre>
-</div>
-<div id="a-line-chart-of-the-trends-in-yearly-counts-for-the-top-states" class="section level3">
-<h3>A line chart of the trends in yearly counts for the top states</h3>
 <pre class="r"><code>ggplot(top_states, aes(x = Year, y = Count, color = state)) +
   geom_line(size = 1.2) +
   labs(
@@ -543,6 +526,7 @@ top_states &lt;- top_states |&gt;
 trends and patterns in adverse actions and medical malpractice reports
 across different states.</li>
 </ul>
+</div>
 </div>
 </div>
 
