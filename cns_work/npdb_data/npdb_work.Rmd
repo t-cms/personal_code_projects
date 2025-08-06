@@ -9,11 +9,20 @@ output: html_document
 
 #### The NPDB is the National Practitioner Data Bank, which is a repository of reports on healthcare practitioners, including adverse actions and medical malpractice payments. 
 
+| Feature                        | Adverse Action Reports (AAR)                         | Medical Malpractice Payment Reports (MMPR)              |
+|-------------------------------|------------------------------------------------------|----------------------------------------------------------|
+| **Type of event**             | Disciplinary or administrative action                | Malpractice payment                                      |
+| **Cause**                     | Misconduct, incompetence, or policy violations       | Alleged negligence resulting in patient harm             |
+| **Filed by**                  | Licensing boards, hospitals, agencies, etc.          | Malpractice insurers or self-insured entities            |
+| **Involves payment?**         | No                                                   | Yes                                                      |
+| **Indicates fault?**          | Possibly (based on formal disciplinary action)        | Not necessarily (payment ≠ admission of fault)          |
+
+
 ##### Analysis Purpose: Through this analysis, I will explore the NPDB data to identify trends and patterns in adverse actions and medical malpractice reports across different states. 
 
 ##### Data Limitations: 
 - For this analysis, I downloaded two datasets from the NPDB website: 
-- The first dataset contains state-level data on adverse actions and medical malpractice reports from 2020- March 31st, 2025. 
+- The first dataset contains state-level data on adverse actions and medical malpractice reports from year 2020- March 31st, 2025. 
 - The second dataset contains yearly reports from 2015 to March 2025 of adverse actions and medical malpractice reports combined by state.
 
 
@@ -23,6 +32,8 @@ library(tidycensus)
 library(dplyr)
 library(janitor)
 library(ggplot2)
+library(maps)
+library(dplyr)
 ```
 
 ```{r}
@@ -48,9 +59,10 @@ top_adverse_states <- npdb_state_data |>
   select(state, adverse_action_report) |> 
   arrange(desc(adverse_action_report)) |> 
   slice(2:6)
+print(top_adverse_states)
 ```
 
-- The top 5 states that have the highest adverse action reports are the following: California, Texas, Florida, Ohio and Michigan 
+- The top 5 states that have the highest AARs are the following: California, Texas, Florida, Ohio and Michigan 
 
 ```{r}
 top_adverse_states |> 
@@ -65,13 +77,15 @@ ggplot(aes(x = reorder(state, adverse_action_report),
   ) +
   theme_minimal()
 ```
-
+- The top 5 states with the most AARs are the following: California, Texas, Florida, Ohio, and Michigan 
 
 ```{r}
 top_malpractice_states <- npdb_state_data |> 
   select(state, medical_malpractice_payment_report) |> 
   arrange(desc(medical_malpractice_payment_report)) |> 
   slice(2:6)
+
+print(top_malpractice_states)
 ```
 
 
@@ -90,9 +104,9 @@ ggplot(aes(x = reorder(state, medical_malpractice_payment_report),
 
 ```
 
-- The top 5 states that have the highest medical malpractice payment reports are the following: New York, Florida, California, Pennsylvania and Texas 
+- The top 5 states that have the highest MMPRs are the following: New York, Florida, California, Pennsylvania and Texas 
 
-- The states that are the occur on both lists are the following: California, Texas, and Florida  
+- The states that occur on both lists are the following: California, Texas, and Florida  
 
 
 ```{r}
@@ -100,6 +114,7 @@ top_states_combined <- npdb_state_data |>
   select(state, total) |> 
   arrange(desc(total)) |> 
   slice(2:6)
+print(top_states_combined)
 
 ```
 
@@ -119,15 +134,127 @@ ggplot(aes(x = reorder(state,total),
 
 
 ```
+- The top 5 states with the most AARs and MMPRs 
+```{r}
+least_adverse_states <- npdb_state_data |> 
+  select(state, adverse_action_report) |> 
+  arrange(adverse_action_report) |>
+  slice(3:7) #using slice 3 because the first two options are other territories and armed forces 
+```
+
+```{r}
+least_adverse_states |> 
+  ggplot(aes(x = reorder(state, adverse_action_report),
+                   y = adverse_action_report)) +
+    geom_col(fill = "orange") +
+    coord_flip() + 
+    labs(
+      title = "5 States with the Least Amount of AARs",
+      x = "State",
+      y = "Adverse Action Reports"
+    ) + 
+  theme_minimal()
+
+```
+- The 5 states with the least amount of AARs are the following: Rhode Island, Idaho, Hawaii, District of Columbia and Puerto Rico 
 
 
 ```{r}
-# Filter for California, Florida, and Texas
+least_malpractice_states <- npdb_state_data |>
+  select(state, medical_malpractice_payment_report) |> 
+  arrange(medical_malpractice_payment_report) |> 
+  slice(3:7) #sliced at 3 because the first two options are other territories and armed foces 
+```
+
+
+```{r}
+least_malpractice_states |> 
+  ggplot(aes(x = reorder(state, medical_malpractice_payment_report),
+                   y = medical_malpractice_payment_report)) +
+    geom_col(fill = "steelblue") +
+    coord_flip() + 
+    labs(
+      title = "5 States with the Least Amount of MMPRs",
+      x = "State",
+      y = "Medical Malpractice Payment Reports"
+    ) + 
+  theme_minimal()
+
+
+
+
+```
+
+- The 5 states with the least amount of MMPRs are the following: Alaska, Vermont, South Dakota, Wyoming, North Dakota 
+
+```{r}
+least_combined_reports_states <- npdb_state_data |> 
+select(state, total) |> 
+  arrange(total) |> 
+  slice(3:7) #using slice 3 because the first two options are other territories and armed forces 
+print(least_combined_reports_states)
+```
+
+
+```{r}
+least_combined_reports_states |> 
+ggplot(aes(x = reorder(state,total), 
+             y = total)) +
+  geom_col(fill = "pink") +  
+  coord_flip() +  
+  labs(
+    title = "States with the Least Amount of AARs and MMPRs",
+    x = "State",
+    y = "Combined Reports"
+  ) +
+  theme_minimal()
+
+```
+- The 5 states with the least amount of combined reports are the following: District of Columbia, Hawaii, South Dakota, Vermont and Idaho 
+
+```{r}
+least_states <- yearly_reports_data |> 
+  filter(state %in% c("Idaho", "Vermont", "South Dakota", "Hawaii", "District of Columbia")) |> 
+  select(-total)
+
+least_states <- least_states |> 
+  pivot_longer (
+    cols = starts_with("year_"), 
+    names_to = "Year", 
+    values_to = "Count"
+  ) |> 
+  mutate( 
+    Year = as.numeric(str_remove(Year, "year_")))
+
+```
+
+```{r}
+ggplot(least_states, aes(x = Year, y = Count, color = state)) +
+  geom_line(size = 1.2) +
+  labs(
+    title = "Trends in Yearly Counts for States with the Least Combined Reports",
+    x = "Year",
+    y = "Count",
+    color = "State"
+  ) +
+  theme_minimal()
+
+```
+
+- Trends in states with the least combined reports: 
+- Decrease in 2025 expected since they don't account for the whole year (January 2025- March 2025)
+  - District of Columbia had over 100 reports in 2015 but since then has managed to have less than 100 reports every year since with just 9 reports so far in     2025 
+  - Hawaii has a pretty consistent yearly reports through the years 2016-2024 with a decrease following after this with 86 reports in 2025 and just 9 reports     so far in 2025 
+  - Vermont has a increase in 2016 with 210 reports and then a decrease in reports until 2024 with an increase from 108 reports in 2023 to 144 reports in 2024    and 37 reports in 2025 
+  - South Dakota has a slight increase in in 2017 with 142 reports then remains pretty steady until a decrease in 2025 
+  - Idaho has its peak number of reports in 2016 with 267 reports then decreases to its all time low in 2021 of 111 reports, which increases the next three years until it decreases to 37 reports in 2025 
+  
+  
+```{r}
 top_states <- yearly_reports_data |> 
   filter(state %in% c("California", "Florida", "Texas")) |> 
-  select(-total)  # Remove 'Total' column
+  select(-total)
 
-# Reshape from wide to long format
 top_states <- top_states |> 
   pivot_longer(
     cols = starts_with("year_"),
@@ -135,8 +262,7 @@ top_states <- top_states |>
     values_to = "Count"
   ) |> 
   mutate(
-    Year = as.numeric(str_remove(Year, "year_"))  # Extract just the year number
-  )
+    Year = as.numeric(str_remove(Year, "year_"))) 
 ```
 
 
@@ -144,13 +270,70 @@ top_states <- top_states |>
 ggplot(top_states, aes(x = Year, y = Count, color = state)) +
   geom_line(size = 1.2) +
   labs(
-    title = "Trends in Yearly Counts for Selected States",
+    title = "Trends in Yearly Counts for Top States with Combined Reports",
     x = "Year",
     y = "Count",
     color = "State"
   ) +
   theme_minimal()
 ```
+- Trends in top states with combined reports: 
+  - California has the highest number of reports, with a spike in 2019 with 6,803 reports and a decrease in 2020 with 5023 reports and continues to decrease until 2025 
+  - Florida has an increase in 2019 with 4462 reports 
+  - Texas has it highest reports in 2015 with 6244 
 
 
-- I plan to continue to do analysis on the NPDB data to identify trends and patterns in adverse actions and medical malpractice reports across different states. 
+```{r}
+# Create data frame
+national_percentage <- data.frame(
+  type = c("Adverse Actions", "Medical Malpractice"),
+  count = c(209032, 55194)
+)
+
+# Add percentage column
+national_percentage$percent <- round(national_percentage$count / sum(national_percentage$count) * 100, 1)
+
+# Plot with ggplot2
+ggplot(national_percentage, aes(x = "", y = count, fill = type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  labs(title = "National Breakdown of Report Types") +
+  geom_text(aes(label = paste0(percent, "%")), 
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_manual(values = c("orange", "skyblue")) +
+  theme_void()
+```
+
+- The national breakdown of report types shows that adverse actions make up 79.1% of the reports while medical malpractice makes up 20.9% of the reports. 
+
+
+
+```{r}
+npdb_state_data$state <- tolower(npdb_state_data$state)
+```
+
+
+```{r}
+#joining data 
+us_map <- map_data("state")
+map_df_states <- left_join(us_map, npdb_state_data, by = c("region" = "state"))
+```
+
+#### Chlorpleth Map of Total Reports by State
+```{r}
+ggplot(map_df_states, aes(x = long, y = lat, group = group, fill = total)) +
+  geom_polygon(color = "white") +
+  coord_fixed(1.3) +
+  scale_fill_viridis_c(option = "plasma", na.value = "grey90") +
+  labs(title = "Total Reports by State", fill = "Total Reports") +
+  theme_void()
+```
+
+
+Next Steps: 
+
+- Plan to do traditional research to figure out ways to be able to track who and where these doctors are losing their license and traveling to another state. 
+
+
+
+
