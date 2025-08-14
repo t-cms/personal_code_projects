@@ -34,6 +34,7 @@ library(janitor)
 library(ggplot2)
 library(maps)
 library(dplyr)
+library(readxl)
 ```
 
 ```{r}
@@ -42,6 +43,10 @@ library(dplyr)
   clean_names()
  yearly_reports_data <- read_csv("yearly_reports.csv") |>
   clean_names()
+ cali_disciplinary_action_report_2025 <- read_excel("cali_medical_board_2025.xlsx") |> 
+   clean_names()
+ florida_disciplinary_action_report_2025 <- read_csv("florida_medical_board_2025.csv") |> 
+   clean_names()
 ```
 
 
@@ -330,9 +335,33 @@ ggplot(map_df_states, aes(x = long, y = lat, group = group, fill = total)) +
 ```
 
 
-Next Steps: 
+#### California Disciplinary Action Report 2025 Analysis 
 
-- Plan to do traditional research to figure out ways to be able to track who and where these doctors are losing their license and traveling to another state. 
+```{r}
+no_license_cali_doctors <- cali_disciplinary_action_report_2025 |> 
+   filter(type_of_action == "Revoked")
+```
+
+- In 2025, California has 21 revoked licenses 
+
+
+#### Florida Disciplinary Action Report 2025 Analysis 
+
+```{r}
+no_license_florida_doctors <- florida_disciplinary_action_report_2025 |> 
+  filter(action_taken == "Revocation")
+```
+
+- In 2025, Florida has 16 revoked licenses 
+
+
+
+```{r}
+
+```
+
+
+
 
 
 

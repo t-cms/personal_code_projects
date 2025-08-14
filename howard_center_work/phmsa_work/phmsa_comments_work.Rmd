@@ -9,6 +9,7 @@ output: html_document
 
 ### PHMSA’s Docket 2019-0091 is an advance notice of proposed rulemaking seeking public input on updating safety regulations for liquefied natural gas (LNG) facilities. The agency aims to modernize outdated rules, incorporate updated industry standards, and address emerging technologies and practices in LNG operations. This process includes evaluating environmental impacts and potential costs and benefits of regulatory changes.
 
+
 ```{r}
 # Load libraries 
 library(tidyverse)
@@ -32,6 +33,7 @@ library(SnowballC)
 library(flextable)
 library(rio)
 library(spacyr)
+library(slam)
 spacy_install()
 
 ```
@@ -43,7 +45,7 @@ read_csv("phmsa_comments_all_.csv") |>
   clean_names() -> phmsa_comments
 ```
 
-## Leading States by Number of Comments
+## Leading States by Number of Comments 
 ```{r}
 state_comments <- phmsa_comments |> 
   mutate(state_province = ifelse(state_province %in% state.name, 
@@ -368,8 +370,7 @@ textdata <- textdata[sel_idx, ]
 
 
 ```{r tm12}
-# number of topics
-# K <- 20
+
 K <- 6
 # set random number generator seed
 set.seed(9161)
@@ -437,7 +438,7 @@ topics
 
 ### Topic Keywords and Assigned Categories
 
-| Topic # | Keywords (truncated)                                            | Suggested Category Name       |
+| Topic # | Keywords (truncated)                                            |  Category Name       |
 |--------:|------------------------------------------------------------------|-------------------------------|
 | 1       | pipeline, infrastructure, community, LNG, safety, update, gas   | `pipeline_safety_update`      |
 | 2       | safety, LNG, community, protect, export, worker, hazard, PHMSA  | `lng_safety_and_labor`        |
@@ -528,8 +529,6 @@ dominantTopics |>
 
 ```
 
-
-
 ### Comments Topic Modeling Results: 
 
 - So, the top two topics are: phmsa_terminal_regulation, lng_export_prioritization. This concludes that the majority of the comments are focused on safety regulations and prioritization of LNG exports. The public is worried about the safety of LNG facilities and the prioritization of LNG exports over safety concerns.
@@ -545,7 +544,7 @@ dominantTopics |>
 
 
 ```{r}
-read_csv("phmsa_2025_0032.csv") |> 
+read_csv("phmsa_2025_0032_comments.csv") |> 
   clean_names() -> phmsa_2025_0032_comments
 
 ```
@@ -559,6 +558,8 @@ state_2025_0032_comments <- phmsa_2025_0032_comments |>
   print(state_2025_0032_comments)
 
 ```
+- So, the top five states underneath the PHMSA docket 2025-0032 are the following: New York, Pennslyvania, New Jersey, California and Florida. 
+
 
 ```{r}
 time_2025_0032_comments <- phmsa_2025_0032_comments |> 
@@ -581,8 +582,18 @@ ggplot(time_2025_0032_comments, aes(x = posted_date, y = comment_count)) +
 
 ```
 
+```{r}
+multiple_comments <- phmsa_2025_0032_comments |> 
+  filter(as.character(posted_date) == "2025-08-04 04:00:00")
 
-## People versus Organizations 
+
+```
+
+- These comments are all the same so I am assuming they came from a mass submission box which I can try to locate. 
+
+
+
+## People Versus Organizations 
 ```{r}
 # People: have both first and last names
 people_2025_0032 <- phmsa_2025_0032_comments |> 
@@ -597,11 +608,362 @@ print(organizations)
 
 ```
 
+### As of now, there are only 49 organizations listed in the PHMSA 2025-0032 docket comments.
 
-### As of now, there are only 2 organizations listed in the PHMSA 2025-0032 docket comments. They are the following: Nuclear Energy Institute and the Naval Nuclear Laboratory. Below will be a summarization of what they entail. 
+## Sentiment Analysis
 
-- Nuclear Energy Institute: Doesn't mention anything in regards to LNG, supports PHMSA 
-- Naval Nuclear Lab: Doesn't mention anything in regards to LNG, supports PHMSA 
+```{r}
+#Tokenizing data 
+phmsa_2025_0032_comments <- phmsa_2025_0032_comments %>% 
+  mutate(clean_comment = str_replace_all(comment, "- ", ""))
+tokenized_2025_0032_df <- tibble(
+  comment = phmsa_2025_0032_comments$clean_comment
+)
+tokenized_2025_0032_comments <- phmsa_2025_0032_comments %>% 
+  select(clean_comment) %>%
+  unnest_tokens(word, clean_comment)
+
+tokenized_2025_0032_comments
+
+```
+
+```{r}
+# Removing stop words 
+tokenized_2025_0032_comments <- tokenized_2025_0032_comments |> 
+ anti_join(stop_words, by = c("word" = "word")) 
+```
+
+
+```{r}
+# Creating Bigrams 
+lng_2025_0032_bigrams <- tokenized_2025_0032_df |> 
+  unnest_tokens(bigram, comment, token="ngrams", n=2)
+
+lng_2025_0032_bigrams
+
+#Filter out stop words.
+
+lng_2025_0032_bigrams1 <- lng_2025_0032_bigrams |> 
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+lng_filtered_2025_0032_bigrams <- lng_2025_0032_bigrams1 |> 
+  filter(!word1 %in% stop_words$word) |> 
+  filter(!word2 %in% stop_words$word) |> 
+    filter(!is.na(word1)) |> 
+     filter(!is.na(word2))
+
+lng_2025_0032_counted_bigrams <- lng_filtered_2025_0032_bigrams |> 
+  count(word1, word2, sort = TRUE)
+
+
+
+
+```
+
+```{r}
+top_twenty_2025_bigrams <- lng_2025_0032_counted_bigrams |> 
+  arrange(desc(n), word1, word2) |>
+  head(20)
+
+top_twenty_2025_bigrams
+```
+
+
+```{r}
+top_twenty_2025_bigrams <- lng_2025_0032_counted_bigrams |>
+  arrange(desc(n), word1, word2) |>
+  head(20) |>
+  mutate(bigrams = paste(word1, word2))
+
+ggplot(top_twenty_2025_bigrams, aes(x = reorder(bigrams, n), y = n)) +
+  geom_col(fill = "yellow") +
+  coord_flip() +
+  labs(
+    title = "Top 20 Most Frequent Bigrams in PHMSA Docket 2025-0032",
+    x = "Bigrams",
+    y = "Frequency", 
+      caption = ".\nGraphic by Tiasia Saunders 07/08/2025"
+  ) +
+  theme_minimal()
+```
+
+- The top five bigrams from the PHMSA 2025_0032 docket comments are the following: hazardous materials, rail car, 49 cfr, natural gas, and lng exports. 
+
+```{r}
+nrc_sentiments <- get_sentiments("nrc")
+afinn_sentiments <- get_sentiments("afinn")
+```
+
+```{r}
+sentiments_2025_comments <- tokenized_2025_0032_comments |> 
+  inner_join(nrc_sentiments, by = "word") 
+  overall_sentiment_count_2025 <- sentiments_2025_comments |>
+  count(sentiment) |> 
+  arrange(desc(n))
+
+```
+
+```{r}
+ggplot(overall_sentiment_count_2025, aes(x = sentiment, y = n)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "purple") +
+  labs(
+    title = "PHMSA Docket 2025-0032 Comments Sentiment Count",
+    x = "Sentiment",
+    y = "Count", 
+      caption = "\nGraphic by Tiasia Saunders 08/12/2025"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+- The most common sentiment of the comments is positive, suggesting that the public is generally supportive of the proposed amendments to hazardous materials regulations. The second most common sentiment is negative, indicating that there are some concerns about the proposed amendments. The third most common sentiment is fear, suggesting that there are some fears about the potential impact of the proposed amendments on hazardous materials regulations. The fourth common sentiment is trust, indicating that there are some concerns about the trustworthiness of the proposed amendments.
+
+## Leading Positive, Negative, Fear, and Trust Sentiments 
+
+```{r}
+overall_negative_2025_count <- sentiments_2025_comments |> 
+   filter(sentiment == "negative") |> 
+  count(sentiment,word) |> 
+  arrange(desc(n))
+
+print(overall_negative_2025_count)
+
+```
+
+
+```{r}
+overall_positive_2025_count <- sentiments_2025_comments |> 
+  filter(sentiment == "positive") |> 
+  count(sentiment, word) |>
+  arrange(desc(n))
+
+print(overall_positive_2025_count)
+```
+
+```{r}
+overall_fear_2025_sentiment <- sentiments_2025_comments |> 
+  filter(sentiment == "fear") |> 
+  count(sentiment, word) |> 
+ arrange(desc(n))
+
+print(overall_fear_2025_sentiment)
+
+```
+
+
+```{r}
+overall_trust_2025_sentiment <-sentiments_2025_comments |> 
+  filter(sentiment == "trust") |>
+  count(sentiment, word) |> 
+  arrange(desc(n))
+
+print(overall_trust_2025_sentiment)
+```
+
+
+## PHMSA Docket 2025-0032 Sentiment Analysis Breakdown
+```{r}
+sentiments_2025_comments %>%
+  count(sentiment, word) %>%
+  group_by(sentiment) %>%
+  slice_max(n, n = 10) %>%  
+  ungroup() %>%
+  mutate(word = reorder_within(word, n, sentiment)) %>%  
+  ggplot(aes(n, word, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +  
+  scale_y_reordered() + 
+  labs(
+    x = "Sentiment Analysis Breakdown For PHMSA Docket 2025-0032 Comments",
+    y = NULL,
+    caption = ".\nGraphic by Tiasia Saunders  08/12/2025"
+  ) 
+```
+
+
+## Topic Modeling 
+
+```{r}
+textdata_2025_0032 <- phmsa_2025_0032_comments |>  
+  
+  select(document_id, posted_date, title, first_name, last_name, comment) |> 
+  as.data.frame() |> 
+  rename(doc_id = document_id, text = comment)
+
+# load stopwords
+english_stopwords <- readLines("https://slcladal.github.io/resources/stopwords_en.txt", encoding = "UTF-8")
+# create corpus object
+corpus_2025 <- Corpus(DataframeSource(textdata_2025_0032))
+# Preprocessing chain
+processedCorpus_2025 <- tm_map(corpus_2025, content_transformer(tolower))
+processedCorpus_2025 <- tm_map(processedCorpus_2025, removeWords, english_stopwords)
+processedCorpus_2025 <- tm_map(processedCorpus_2025, removePunctuation, preserve_intra_word_dashes = TRUE)
+processedCorpus_2025 <- tm_map(processedCorpus_2025, removeNumbers)
+processedCorpus_2025 <- tm_map(processedCorpus_2025, stemDocument, language = "en")
+processedCorpus_2025 <- tm_map(processedCorpus_2025, stripWhitespace)
+```
+
+```{r tm3a}
+#DTM: rows correspond to the documents in the corpus. Columns correspond to the terms in the documents. Cells correspond to the weights of the terms. (Girder)
+# compute document term matrix with terms >= minimumFrequency
+minimumFrequency <- 5
+DTM_2025 <- DocumentTermMatrix(processedCorpus_2025, control = list(bounds = list(global = c(minimumFrequency, Inf))))
+# have a look at the number of documents and terms in the matrix
+dim(DTM_2025)
+# due to vocabulary pruning, we have empty rows in our DTM
+# LDA does not like this. So we remove those docs from the
+# DTM and the metadata
+sel_idx <- slam::row_sums(DTM) > 0
+DTM_2025 <- DTM_2025[sel_idx, ]
+textdata_2025_0032 <- textdata[sel_idx, ]
+#5 term minimum[1] 1387 3019
+#5 term minimum[1] 308597 10339
+
+```
+
+```{r}
+DTM_2025 <- DTM_2025[rowSums(as.matrix(DTM_2025)) > 0, ]
+```
+
+```{r tm12}
+K <- 6
+set.seed(9161)
+
+topicModel2_2025 <- LDA(DTM_2025, K, method = "Gibbs", control = list(iter = 500, verbose = 25, alpha = 0.2))
+
+tmResult_2025 <- posterior(topicModel2)
+theta_2025 <- tmResult$topics
+beta_2025 <- tmResult$terms
+
+topicNames_2025 <- apply(terms(topicModel2_2025, 10), 2, paste, collapse = " ")
+
+
+```
+
+
+```{r}
+# Step 1: Check dimensions
+# Ensure doc_id and rownames are character
+rownames(theta_2025) <- as.character(rownames(theta_2025))
+textdata_2025_0032$doc_id <- as.character(textdata_2025_0032$doc_id)
+
+# Get common document IDs
+common_ids_2025 <- intersect(rownames(theta_2025), textdata_2025_0032$doc_id)
+
+# Filter both datasets to only include common documents
+theta_aligned_2025 <- theta_2025[rownames(theta_2025) %in% common_ids_2025, ]
+textdata_2025_0032_filtered <- textdata_2025_0032[textdata_2025_0032$doc_id %in% common_ids_2025, ]
+
+# Reorder textdata_filtered to match theta_aligned
+textdata_2025_0032_filtered <- textdata_2025_0032_filtered[match(rownames(theta_aligned_2025), textdata_2025_0032_filtered$doc_id), ]
+
+# Check that everything lines up
+if (!all(rownames(theta_aligned_2025) == textdata_2025_0032_filtered$doc_id)) {
+  stop("The document IDs still do not match. Please check the data alignment.")
+}
+
+# Print dimensions
+n_theta_2025 <- nrow(theta_aligned_2025)
+n_textdata_2025_0032_filtered <- nrow(textdata_2025_0032_filtered)
+cat("Number of aligned theta rows: ", n_theta_2025, "\n")
+cat("Number of aligned textdata rows: ", n_textdata_2025_0032_filtered, "\n")
+
+# Combine data
+topic_data_2025 <- data.frame(theta_aligned_2025, text = textdata_2025_0032_filtered$text)
+
+# Aggregate topic proportions by dom_vs_intl
+topic_proportion_per_category_2025 <- aggregate(. ~ text, data = topic_data_2025, FUN = mean)
+
+# Rename topic columns (assuming K and topicNames are defined)
+colnames(topic_proportion_per_category_2025)[2:(K+1)] <- topicNames_2025
+
+# Reshape for visualization
+vizDataFrame_2025 <- melt(topic_proportion_per_category_2025, id.vars = "text")
+
+# Optionally filter out a decade if needed
+# vizDataFrame <- subset(vizDataFrame, decade != 1960)
+```
+
+
+```{r}
+#enframe(): Converts a named list into a dataframe.
+topics_2025 <- enframe(topicNames_2025, name = "number", value = "text") %>% 
+  unnest(cols = c(text)) 
+  
+topics_2025
+```
+
+### Topic Keywords and Assigned Categories
+
+| Topic # | Keywords (truncated)                                                   |  Category Name           |
+|--------:|------------------------------------------------------------------------|-----------------------------------|
+| 1       | lng, transport, rail, communiti, time, materi, hazard, gas, place, ban | `lng_transport_regulation_ban`    |
+| 2       | lng, transport, rail, communiti, time, gas, hazard, materi, derail, live | `lng_transport_safety_derailment` |
+| 3       | lng, rail, transport, car, explos, gas, fire, hazard, safeti, vapor     | `lng_explosion_fire_risk`         |
+| 4       | lng, transport, communiti, rail, time, hazard, materi, gas, derail, urg | `lng_transport_emergency_risks`   |
+| 5       | lng, transport, rail, communiti, time, hazard, gas, materi, live, liquefi | `lng_liquefaction_and_impact`     |
+| 6       | lng, transport, communiti, rail, time, materi, gas, hazard, car, export | `lng_export_transportation`       |
+
+
+
+```{r}
+# Add categories based on topic keywords
+vizDataFrame_2025 <- vizDataFrame_2025 |>
+  mutate(category = case_when(
+    str_detect(str_squish(variable), "lng transport rail communiti time materi hazard gas place ban") ~ "lng_transport_regulation_ban",
+    str_detect(str_squish(variable), "lng transport rail communiti time gas hazard materi derail live") ~ "lng_transport_safety_derailment",
+    str_detect(str_squish(variable), "lng rail transport car explos gas fire hazard safeti vapor") ~ "lng_explosion_fire_risk",
+    str_detect(str_squish(variable), "lng transport communiti rail time hazard materi gas derail urg") ~ "lng_transport_emergency_risks",
+    str_detect(str_squish(variable), "lng transport rail communiti time hazard gas materi live liquefi") ~ "lng_liquefaction_and_impact",
+    str_detect(str_squish(variable), "lng transport communiti rail time materi gas hazard car export",) ~ "lng_export_transportation",
+    TRUE ~ "other"
+  ))
+
+```
+
+```{r}
+dominantTopics_2025 <- vizDataFrame_2025 |>
+  group_by(text) |>
+  slice_max(value, n = 1) |>   # Keep only the topic with highest probability
+  ungroup()
+
+```
+
+
+```{r}
+
+dominantTopics_2025 |>
+  count(category) |>
+  mutate(proportion = n / sum(n)) |>
+  ggplot(aes(x = category, y = proportion, fill = category)) +
+  geom_bar(stat = "identity") +
+  ylab("Proportion of Comments") +
+  labs(
+    title = "Dominant Topics in PHMSA Comments 2025-0032",
+    subtitle = "Based on most probable topic per comment",
+    caption = "Graphic by Tiasia Saunders"
+  ) +
+  scale_fill_manual(
+    values = c("#9933FF", "#33FFFF", "red", "yellow", "darkblue", "lavender")
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
+
+## Comments Topic Modeling Results:
+- So, the top two topics are: lng_transport_emergency_risks and lng_export_transportaton. This suggests that the public is concerned about the regulation of LNG export transportation and the emergency risk associated with LNG transportation in general. 
+
+- The third most mentioned topic is lng_liquefaction_and impact, which suggests that the public is concerned about the impact of LNG liquefaction on the environment and the community.
+
+- The least mentioned topics are: lng_tranport_regulation_ban and lng_transport_safety_derailment. This suggests that the public is less concerned about the regulation of LNG transportation and the safety of LNG transportation in the event of a derailment.
+
+## Overall Conclusion: 
+
+- The analysis of the PHMSA dockets 2019-0091 and 2025-0032 comments reveals that the public is generally supportive of the proposed amendments to LNG facilities and hazardous materials regulations. The most common sentiments are positive, indicating a general support for safety regulations and labor issues.
+
+Additionally, the topic modeling results suggest that the public is most concerned about safety regulations, emergency risks, and prioritization of LNG exports, which are all important issues in the LNG industry. The least mentioned topics are less critical to the public, but they are still important for the public to address.
+
+Lastly, the analysis of the top bigrams in both dockets reveals that the public is concerned about the safety and infrastructure of LNG facilities, as well as the impact on workers and the environment. The bigrams also suggest that the public is concerned about the environmental impact of LNG facilities, particularly in relation to methane gas emissions.
 
 
 
