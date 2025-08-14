@@ -961,9 +961,9 @@ dominantTopics_2025 |>
 
 - The analysis of the PHMSA dockets 2019-0091 and 2025-0032 comments reveals that the public is generally supportive of the proposed amendments to LNG facilities and hazardous materials regulations. The most common sentiments are positive, indicating a general support for safety regulations and labor issues.
 
-Additionally, the topic modeling results suggest that the public is most concerned about safety regulations, emergency risks, and prioritization of LNG exports, which are all important issues in the LNG industry. The least mentioned topics are less critical to the public, but they are still important for the public to address.
+- Additionally, the topic modeling results suggest that the public is most concerned about safety regulations, emergency risks, and prioritization of LNG exports, which are all important issues in the LNG industry. The least mentioned topics are less critical to the public, but they are still important for the public to address.
 
-Lastly, the analysis of the top bigrams in both dockets reveals that the public is concerned about the safety and infrastructure of LNG facilities, as well as the impact on workers and the environment. The bigrams also suggest that the public is concerned about the environmental impact of LNG facilities, particularly in relation to methane gas emissions.
+- Lastly, the analysis of the top bigrams in both dockets reveals that the public is concerned about the safety and infrastructure of LNG facilities, as well as the impact on workers and the environment. The bigrams also suggest that the public is concerned about the environmental impact of LNG facilities, particularly in relation to methane gas emissions.
 
 
 
