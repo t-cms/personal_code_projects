@@ -802,7 +802,7 @@ processedCorpus_2025 <- tm_map(processedCorpus_2025, stemDocument, language = "e
 processedCorpus_2025 <- tm_map(processedCorpus_2025, stripWhitespace)
 ```
 
-```{r tm3a}
+```{r}
 #DTM: rows correspond to the documents in the corpus. Columns correspond to the terms in the documents. Cells correspond to the weights of the terms. (Girder)
 # compute document term matrix with terms >= minimumFrequency
 minimumFrequency <- 5
@@ -824,7 +824,7 @@ textdata_2025_0032 <- textdata[sel_idx, ]
 DTM_2025 <- DTM_2025[rowSums(as.matrix(DTM_2025)) > 0, ]
 ```
 
-```{r tm12}
+```{r}
 K <- 6
 set.seed(9161)
 
