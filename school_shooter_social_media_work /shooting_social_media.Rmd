@@ -1,0 +1,118 @@
+---
+title: "school_shooting_social_media"
+author: "Tiasia Saunders"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+This study seeks to determine whether discernible patterns exist in the online behavior of school shooters prior to their attacks, with the goal of informing prevention and early intervention efforts.
+
+## School Shooters and Social Media Basic Analysis 
+
+#### This dataset was downloaded from the Washington Post Mass School Shootings Database. The dataset contains information on school shootings in the United States from 1970 to 2021. The analysis will focus on school shootings that occurred from 2010 to 2024, as this period saw a significant increase in social media usage among teenagers and young adults. The goal in exploring the dataset is to identify potential patterns or behavioral indicators in the online activity of school shooters prior to committing their attacks.
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(janitor)
+library(maps)
+```
+
+
+```{r}
+school_shooting_data <- read_csv("school-shootings-data.csv")
+```
+
+#### Filtering Dataset for school shootings where there was at least one victim and from the year 2010-- due to social media's prevelence (Instagram launched in 2010) during that time. 
+```{r}
+school_shooting_victims <- school_shooting_data |> 
+  filter( killed > 0  & year >= 2010)
+
+```
+
+
+## Data Analysis 
+
+```{r}
+school_shooting_by_year <- school_shooting_victims |> 
+   group_by(year) |> 
+  summarise(num_shootings = n())
+```
+
+#### School Shootings by Year (2010-2025)
+```{r}
+school_shooting_by_year |> 
+  ggplot(aes(x = factor(year), y = num_shootings)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(
+    title = "Number of School Shootings by Year",
+    x = "Year",
+    y = "Number of Shootings"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+school_shooting_victims |> 
+  count(day_of_week) |>
+  arrange(desc(n))
+```
+
+
+#### School Shooter Demographics 
+```{r}
+school_shooting_victims |> 
+  filter(!is.na(age_shooter1)) |> 
+  count(age_shooter1) |> 
+  arrange(desc(n))
+```
+
+```{r}
+school_shooting_victims |> 
+  count(gender_shooter1)
+```
+
+```{r}
+school_shooting_victims |> 
+  count(shooting_type) |> 
+  arrange(desc(n))
+```
+
+#### State Breakdown 
+```{r}
+school_shooting_victims |> 
+ count(state) |> 
+  arrange(desc(n))
+```
+
+
+```{r}
+school_shooting_victims |> 
+  ggplot(aes(x = factor(state))) +
+  geom_bar(fill = "pink") +
+  labs(
+    title = "Number of School Shootings by State (2010-2024)",
+    x = "State",
+    y = "Number of Shootings"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+ school_shooting_victims |> 
+  count(school_type)
+```
+
+
+```{r}
+write_csv(school_shooting_victims, "school_shooting_victims.csv")
+```
+
+
+
+
+
+
