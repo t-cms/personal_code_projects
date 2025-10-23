@@ -107,6 +107,9 @@ school_shooting_victims |>
 ```
 
 
+```{r}
+write_csv(school_shooting_victims, "school_shooting_victims.csv")
+```
 
 
 
