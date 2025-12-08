@@ -6,7 +6,7 @@
 }
 
 .non-gradient-section {
-    background-color: rgba(0, 0, 0, 0.77);
+ background-color: rgb(92, 92, 92);
     padding: 20px 0;
     overflow: hidden;   /* prevents collapsing margins */
 }
@@ -16,8 +16,7 @@
     background-color: rgb(92, 92, 92); /* color inside the box */
     padding: 15px; /* slightly less space around the text */
     border: 2px solid #ccc; /* outline around the box */
-    border-radius: 30px; /* rounded corners */
-    width: 50%; /* smaller width (was 80%) */
+    border-radius: 30px; /* rounded corners */ /* smaller width (was 80%) */
     max-width: 600px; /* optional: limit maximum width */
     margin: 50px auto; /* center the box vertically & horizontally */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* soft shadow */
@@ -40,7 +39,6 @@
 
     
     
-}
 
 .intro{
      background-color: rgb(92, 92, 92); /* color inside the box */
@@ -78,6 +76,7 @@ h2 {  text-align: center;
     flex-direction: column;
 
 }
+
 
 .section-1 {
     position: relative; /* allows absolute positioning of child */
@@ -137,9 +136,12 @@ li {
     margin-bottom: 10px; /* adds space between bullet points */
     line-height: 1.6;    /* spreads out lines for readability */
 }
+@media (max-width: 768px) {
+    .img-fluid {
+        max-height: 250px !important;
+        width: auto !important;
+    }
+}  
 
 
-.img-fluid {
-    border-radius: 30px;
-}
 
