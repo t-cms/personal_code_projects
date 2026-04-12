@@ -72,6 +72,9 @@ Visualizations include:
 - MSI Type Breakdown: HSI and AANAPISI dominate; PBI and HBCUs are minimally represented.
 - Each visualization uncovers both progress and persisting gaps in NASA's outreach and recruitment efforts.
 
+```{r}
+install.packages("magick")
+```
 
 
 ```{r}
@@ -83,6 +86,7 @@ library(janitor)
 library(ggplot2)
 library(scales)
 library(googlesheets4)
+library(magick)
 ```
 
 
