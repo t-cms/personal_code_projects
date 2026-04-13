@@ -1,11 +1,9 @@
 ---
-title: "Natiaonl Death Tracker Data Analysis"
+title: "National Reformatory Death Tracker Data Analysis"
 author: "Tiasia Saunders"
 date: "`r Sys.Date()`"
 output: html_document
 ---
-
-## National Reformatory Death Tracker Data Analysis 
 
 ### About this dataset: 
 
@@ -335,7 +333,7 @@ looking_at_death_counts <- national_death_tracker |>
 - Most of our data has not been reported on recently (76); we are defining recent as the last five years.
 - We have 73 facilities with allegations of abuse, 32 unknown, and 1 marked no.
 - We have 39 facilities with allegations of forced labor, 54 unknown, and 12 with no allegations of forced labor.
-- It looks like we have a total of 1,391 deaths across all of these reformatories, correctional facilities, and industrial schools. Of that total, 372 deaths are associated with abandoned cemeteries. Of those 372, 230 are from the Cheltenham Reformatory.(expecting the 230 number to increase with what Rob told us about Haley finding out 10 more deaths in an annual report) is from the Cheltenham Reformatory.
+- It looks like we have a total of 1,391 deaths across all of these reformatories, correctional facilities, and industrial schools. Of that total, 372 deaths are associated with abandoned cemeteries. Of those 372, 230 are from the Cheltenham Reformatory.(expecting the 230 number to increase with what Rob told us about Haley finding out 10 more deaths in an annual report)
 
 
   
