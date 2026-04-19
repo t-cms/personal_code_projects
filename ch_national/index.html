@@ -147,16 +147,19 @@
         delay: 360
       },
       {
-        w: 30, h: 54,
-        finalX: 34, finalY: 24,
-        finalRotate: 2,
-        overshootX: 32, overshootY: 22,
-        overshootRotate: 5,
-        startX: 105, startY: 10,
-        startRotate: 18,
-        z: 7,
-        delay: 130
-      }
+  w: 22, h: 28,              // smaller so it doesn’t dominate
+  finalX: 78, finalY: 70,    // bottom-right corner
+  finalRotate: 3,
+
+  overshootX: 80, overshootY: 68,
+  overshootRotate: 6,
+
+  startX: 120, startY: 120,  // comes from bottom-right
+  startRotate: 15,
+
+  z: 5,                      // LOWER z-index so it sits behind others
+  delay: 130
+}
     ];
 
     photos.forEach((photo, i) => {
