@@ -64,6 +64,7 @@ library(readxl)
 library(janitor)
 library(lubridate)
 library(ggplot2)
+library(tidygeocoder)
 ```
 
 
@@ -74,6 +75,68 @@ library(ggplot2)
 national_death_tracker <- read_csv("national_reformatory_death_tracker.csv") |> 
   clean_names()
 ```
+
+
+### Getting Lat + Long for Map Data 
+```{r}
+national_death_tracker <- national_death_tracker [1:106, ]
+```
+
+```{r}
+national_clean <- national_clean [1:106, ]
+```
+
+```{r}
+national_death_tracker$city_state <- gsub("([A-Za-z ]) ([A-Z]{2})$", "\\1, \\2", national_death_tracker$city_state)
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(tidygeocoder)
+
+national_clean <- national_death_tracker |>
+  mutate(
+    city_state = str_trim(city_state),
+    city_state = str_remove_all(city_state, '"'),
+    city_state = str_remove(city_state, "\\s*\\(.*\\)"),
+    city_state = na_if(city_state, ""),
+    
+    # fix common misspellings / problem entries
+    city_state = str_replace_all(city_state, fixed("Masachusettes"), "Massachusetts"),
+    city_state = str_replace_all(city_state, fixed("Massachussetts"), "Massachusetts"),
+    city_state = str_replace_all(city_state, fixed("Cincinatti"), "Cincinnati"),
+    city_state = str_replace_all(city_state, fixed("Gainsville"), "Gainesville"),
+    city_state = str_replace_all(city_state, fixed("Milest City"), "Miles City"),
+    city_state = str_replace_all(city_state, fixed("Washington, D.C."), "Washington, DC"),
+    city_state = str_replace_all(city_state, fixed("O'ahu, Hawaii"), "Oahu, Hawaii"),
+    
+    # flag rows that are only a state and not city + state
+    state_only = !str_detect(city_state, ",")
+  )
+```
+
+```{r}
+national_clean$city_state <- gsub("\\s*\\(.*?\\)", "", national_clean$city_state)
+```
+
+```{r}
+national_clean$city_state <- trimws(national_clean$city_state)
+```
+
+```{r}
+national_geo <- national_clean |> 
+  mutate(full_location = paste(name_of_facility, city_state, sep = ", ")) |> 
+  geocode(full_location, method = "osm", lat = latitude, long = longitude)
+
+```
+
+```{r}
+national_geo_data <- national_death_tracker |> 
+  mutate(location = paste(city, state, sep = ", ")) |> 
+  geocode(location, method = "osm", lat = latitude, long = longitude)
+```
+
 ```{r}
 ### cleaning up deaths column 
 national_death_tracker <- national_death_tracker |> 
@@ -88,6 +151,14 @@ national_death_tracker <- national_death_tracker |>
 facility_type_count <- national_death_tracker |> 
   count(facility_type) |> 
   arrange(desc(n))
+```
+
+```{r}
+write.csv(facility_type_count, "facility_type_count.csv", row.names = FALSE)
+```
+
+```{r}
+write.csv(national_clean, "national_clean.csv", row.names = FALSE)
 ```
 
 
