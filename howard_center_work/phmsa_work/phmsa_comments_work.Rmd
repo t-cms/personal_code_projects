@@ -9,7 +9,6 @@ output: html_document
 
 ### PHMSA’s Docket 2019-0091 is an advance notice of proposed rulemaking seeking public input on updating safety regulations for liquefied natural gas (LNG) facilities. The agency aims to modernize outdated rules, incorporate updated industry standards, and address emerging technologies and practices in LNG operations. This process includes evaluating environmental impacts and potential costs and benefits of regulatory changes.
 
-
 ```{r}
 # Load libraries 
 library(tidyverse)
@@ -22,26 +21,17 @@ library(janitor)
 library(tm)
 library(topicmodels)
 library(lda)
-library(ldatuning)
 library(DT)
 library(knitr)
 library(kableExtra)
 library(reshape2)
-library(wordcloud)
-library(pals)
-library(SnowballC)
-library(flextable)
-library(rio)
-library(spacyr)
-library(slam)
-spacy_install()
 
 ```
 
 ```{r}
 # Load the data
 
-read_csv("phmsa_comments_all_.csv") |> 
+read_csv("phmsa_comments_all.csv") |> 
   clean_names() -> phmsa_comments
 ```
 
@@ -544,7 +534,7 @@ dominantTopics |>
 
 
 ```{r}
-read_csv("phmsa_2025_0032_comments.csv") |> 
+read_csv("phmsa_2025_0032.csv") |> 
   clean_names() -> phmsa_2025_0032_comments
 
 ```
