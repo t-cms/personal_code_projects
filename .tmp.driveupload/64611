@@ -1,7 +1,7 @@
 ---
 title: "National Reformatory Death Tracker Data Analysis"
 author: "Tiasia Saunders"
-date: "`r Sys.Date()`"
+date: "2026-05-29"
 output: html_document
 ---
 
@@ -54,14 +54,43 @@ output: html_document
   - To be able to get a more cohesive breakdown of the racial demographic, facility type, and additional fields of these facilities, with the abandoned cemeteries and ‘x’ amount of burial deaths in that gravesite.
 
 
-```{r}
+
+``` r
 ## loading libraries 
 library(tidyverse)
+```
+
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.0     ✔ tibble    3.3.0
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.1
+## ✔ purrr     1.2.0     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
 library(dplyr)
 library(stringr)
 library(knitr)
 library(readxl)
 library(janitor)
+```
+
+```
+## 
+## Attaching package: 'janitor'
+## 
+## The following objects are masked from 'package:stats':
+## 
+##     chisq.test, fisher.test
+```
+
+``` r
 library(lubridate)
 library(ggplot2)
 library(tidygeocoder)
@@ -69,21 +98,35 @@ library(tidygeocoder)
 
 
 
-```{r}
+
+``` r
 ### loading data 
 
 national_death_tracker <- read_csv("new_national_clean.csv") |> 
   clean_names()
 ```
 
+```
+## Rows: 92 Columns: 16
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr (15): name_of_facility, city_state, facility_type, race, gender, still_i...
+## dbl  (1): deaths_na
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
 
 ### Getting Lat + Long for Map Data 
 
-```{r}
+
+``` r
 national_death_tracker$city_state <- gsub("([A-Za-z ]) ([A-Z]{2})$", "\\1, \\2", national_death_tracker$city_state)
 ```
 
-```{r}
+
+``` r
 library(dplyr)
 library(stringr)
 library(tidygeocoder)
@@ -109,28 +152,48 @@ national_clean <- national_death_tracker |>
   )
 ```
 
-```{r}
+
+``` r
 national_clean$city_state <- gsub("\\s*\\(.*?\\)", "", national_clean$city_state)
 ```
 
-```{r}
+
+``` r
 national_clean$city_state <- trimws(national_clean$city_state)
 ```
 
-```{r}
+
+``` r
 national_geo <- national_clean |> 
   mutate(full_location = paste(name_of_facility, city_state, sep = ", ")) |> 
   geocode(full_location, method = "osm", lat = latitude, long = longitude)
-
 ```
 
-```{r}
+```
+## Passing 91 addresses to the Nominatim single address geocoder
+```
+
+```
+## Query completed in: 92.1 seconds
+```
+
+
+``` r
 national_geo_data <- national_death_tracker |> 
   mutate(location = paste(city, state, sep = ", ")) |> 
   geocode(location, method = "osm", lat = latitude, long = longitude)
 ```
 
-```{r}
+```
+## Passing 88 addresses to the Nominatim single address geocoder
+```
+
+```
+## Query completed in: 151.3 seconds
+```
+
+
+``` r
 ### cleaning up deaths column 
 national_death_tracker <- national_death_tracker |> 
   mutate(deaths_clean = str_extract(deaths_na, "\\d+"),
@@ -140,22 +203,26 @@ national_death_tracker <- national_death_tracker |>
 #### Preliminary Data Analysis 
 
 ##### Breakdown of facility type 
-```{r}
+
+``` r
 facility_type_count <- national_death_tracker |> 
   count(facility_type) |> 
   arrange(desc(n))
 ```
 
-```{r}
+
+``` r
 write.csv(facility_type_count, "facility_type_count.csv", row.names = FALSE)
 ```
 
-```{r}
+
+``` r
 write.csv(national_clean, "national_clean.csv", row.names = FALSE)
 ```
 
 
-```{r}
+
+``` r
 ## creating pie chart of facility type breakdwon 
 ggplot(facility_type_count, aes(x = "", y = n, fill = facility_type)) +
   geom_bar(stat = "identity", width = 1) +
@@ -170,17 +237,21 @@ ggplot(facility_type_count, aes(x = "", y = n, fill = facility_type)) +
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+
 ##### We have 52 reformatories, 36 industrial schools, and 3 correctional facilities in our dataset. 
 
 ##### Gender Count Breakdown 
 
-```{r}
+
+``` r
 gender_count <- national_death_tracker |> 
   count(gender) |> 
   arrange(desc(n))
 ```
 
-```{r}
+
+``` r
  ggplot(gender_count, aes(x = "", y = n, fill = gender)) +
   geom_bar(stat = "identity", width = 1) +
   coord_polar(theta = "y") +
@@ -203,17 +274,21 @@ gender_count <- national_death_tracker |>
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+
 ##### We have 40 boys facilities, 30 girls facilities, and 21 both genders facilities.
 
 ##### Race Count Breakdown 
 
-```{r}
+
+``` r
 race_count <- national_death_tracker |> 
   count(race) |> 
   arrange(desc(n))
 ```
 
-```{r}
+
+``` r
 ggplot(race_count, aes(x = "", y = n, fill = race)) +
   geom_bar(stat = "identity", width = 1) +
   
@@ -227,16 +302,20 @@ ggplot(race_count, aes(x = "", y = n, fill = race)) +
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+
 ##### We have 17 white facilities, 17 black facilities, 11 facilities with all races but segregated, and 10 facilities with both white and black races.
 
 ##### Cemetery Count Breakdown
-```{r}
+
+``` r
 cemetery_count <- national_death_tracker |> 
   count(cemetery) |> 
   arrange(desc(n))
 ```
 
-```{r}
+
+``` r
 ggplot(cemetery_count, aes(x = "", y = n, fill = cemetery)) +
   geom_bar(stat = "identity", width = 1) +
   
@@ -250,17 +329,21 @@ ggplot(cemetery_count, aes(x = "", y = n, fill = cemetery)) +
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+
 #### We have 23 facilities with cemeteries, 62 without cemteries, and 6 to be possible. 
 
 ##### State of Cemetery Breakdown 
 
-```{r}
+
+``` r
 state_of_cemetery_breakdown <- national_death_tracker |> 
   count(state_of_cemetery) |> 
   arrange(desc(n))
 ```
 
-```{r}
+
+``` r
 ggplot(state_of_cemetery_breakdown, aes(x = "", y = n, fill = state_of_cemetery)) +
   geom_bar(stat = "identity", width = 1) +
   
@@ -274,11 +357,14 @@ ggplot(state_of_cemetery_breakdown, aes(x = "", y = n, fill = state_of_cemetery)
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-21-1.png" width="672" />
+
 ##### Out of the cemeteries breakdown, we have 16 cemeteries that are maintained and we have 2 that were abandoned. 
 
 ##### Abandonded Cemeteries Death Count
 
-```{r}
+
+``` r
 ## counting the number of deaths for abandoned cemeteries 
 abandoned_cemetery_count <- national_death_tracker |> 
   filter(state_of_cemetery == "abandoned") |> 
@@ -289,7 +375,8 @@ abandoned_cemetery_count <- national_death_tracker |>
 
 ##### Abandoned Cemeteries Breakdown
 
-```{r}
+
+``` r
 abandoned_cemteries <- national_death_tracker |> 
   filter(state_of_cemetery == "abandoned") |> 
   select(name_of_facility, facility_type, race, city_state, gender, allegations_of_abuse, years_of_existence, death_qualifiers, reported_on_recently, allegations_of_forced_labor, deaths_clean) 
@@ -306,7 +393,8 @@ write.csv(abandoned_cemteries, "abandoned_cemeteries.csv", row.names = FALSE)
 
 ##### Reported on Recently Breakdown 
 
-```{r}
+
+``` r
 reported_recently_count <- national_death_tracker |> 
  count(reported_on_recently) |> 
   arrange(desc(n))
@@ -314,12 +402,22 @@ reported_recently_count <- national_death_tracker |>
 reported_recently_count
 ```
 
+```
+## # A tibble: 3 × 2
+##   reported_on_recently     n
+##   <chr>                <int>
+## 1 no                      66
+## 2 yes                     25
+## 3 <NA>                     1
+```
+
 
 ##### Most of our data has not been reported on recently (66), we are looking at whether it was reported on in the last five years. 
 
 ##### Abuse/Forced Allegations Breakdown 
 
-```{r}
+
+``` r
 abuse_allegations_count <- national_death_tracker |> 
   count(allegations_of_abuse) |> 
   arrange(desc(n))
@@ -329,7 +427,8 @@ forced_labor_count <- national_death_tracker |>
   arrange(desc(n))
 ```
 
-```{r}
+
+``` r
 ggplot(abuse_allegations_count, aes(x = "", y = n, fill = allegations_of_abuse)) +
   geom_bar(stat = "identity", width = 1) +
   
@@ -343,9 +442,12 @@ ggplot(abuse_allegations_count, aes(x = "", y = n, fill = allegations_of_abuse))
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-26-1.png" width="672" />
+
 ##### We have 50 facilities with allegations of abuse and 41 unknown with 1 being NA. 
 
-```{r}
+
+``` r
 ggplot(forced_labor_count, aes(x = "", y = n, fill = allegations_of_forced_labor)) +
   geom_bar(stat = "identity", width = 1) +
   
@@ -359,11 +461,14 @@ ggplot(forced_labor_count, aes(x = "", y = n, fill = allegations_of_forced_labor
   theme(legend.position = "right")
 ```
 
+<img src="cheltenham_national_data_work_files/figure-html/unnamed-chunk-27-1.png" width="672" />
+
 ##### We have 20 facilities with allegations of forced labor, 71 unknown, and 1 with NA 
 
 
 ##### Death Count Total 
-```{r}
+
+``` r
 national_death_tracker <- national_death_tracker |> 
   mutate(deaths_clean = str_extract(deaths_na, "\\d+"),
          deaths_clean = as.numeric(deaths_clean)) 
@@ -371,7 +476,12 @@ national_death_tracker <- national_death_tracker |>
   total_deaths
 ```
 
-```{r}
+```
+## [1] 1996
+```
+
+
+``` r
 looking_at_death_counts <- national_death_tracker |> 
   select(deaths_na, deaths_clean, death_qualifiers)
 ```
