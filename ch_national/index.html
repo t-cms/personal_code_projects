@@ -1,190 +1,252 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Full Screen Collage Animation</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Screen Collage Animation</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #f3f3f3;
-      font-family: Arial, sans-serif;
-    }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #635c5c;
+        font-family: Arial, sans-serif;
+      }
 
-    .stage {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
+      .stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
 
-    .photo {
-      position: absolute;
-      object-fit: cover;
-      opacity: 0;
-      transform-origin: center center;
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
-      will-change: transform, opacity;
-    }
-
-    .photo.animate {
-      animation: heroIn 1s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
-    }
-
-    @keyframes heroIn {
-      0% {
+      .photo {
+        position: absolute;
+        object-fit: cover;
         opacity: 0;
-        transform:
-          translate(var(--start-x), var(--start-y))
-          scale(0.6)
-          rotate(var(--start-rotate));
+        transform-origin: center center;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+        will-change: transform, opacity;
       }
 
-      65% {
-        opacity: 1;
-        transform:
-          translate(var(--overshoot-x), var(--overshoot-y))
-          scale(1.04)
-          rotate(var(--overshoot-rotate));
+      .photo.animate {
+        animation: heroIn 1s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
       }
 
-      100% {
-        opacity: 1;
-        transform:
-          translate(var(--final-x), var(--final-y))
-          scale(1)
-          rotate(var(--final-rotate));
+      @keyframes heroIn {
+        0% {
+          opacity: 0;
+          transform: translate(var(--start-x), var(--start-y)) scale(0.6) rotate(var(--start-rotate));
+        }
+
+        65% {
+          opacity: 1;
+          transform: translate(var(--overshoot-x), var(--overshoot-y)) scale(1.04) rotate(var(--overshoot-rotate));
+        }
+
+        100% {
+          opacity: 1;
+          transform: translate(var(--final-x), var(--final-y)) scale(1) rotate(var(--final-rotate));
+        }
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="stage">
-    <img class="photo" src="1913 Cheltenham annual report 2026-02-07 16.12.36.jpg" alt="Photo 1">
-    <img class="photo" src="13248.jpg" alt="Photo 2">
-    <img class="photo" src="genoa_17466.jpg" alt="Photo 3">
-    <img class="photo" src="LH-070-2-13-04-resized-1200x953.jpg" alt="Photo 4">
-    <img class="photo" src="3e16f3434dd9c3d677a13092d894328f.jpg" alt="Photo 5">
-    <img class="photo" src="Negro-Boys-Industrial-Fire.-Photo-of-Boys-Equal-Justice-Initiative-300x300.jpg" alt="Photo 6">
-    <img class="photo" src="LH_070_2_13_12-Resized.jpg" alt="Photo 7">
-  </div>
 
-  <script>
-    const photos = document.querySelectorAll(".photo");
+      .center-text {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
 
-    const layout = [
-      {
-        w: 42, h: 52,
-        finalX: 0, finalY: 0,
-        finalRotate: -4,
-        overshootX: -2, overshootY: -2,
-        overshootRotate: -7,
-        startX: -70, startY: -60,
-        startRotate: -18,
-        z: 2,
-        delay: 0
-      },
-      {
-        w: 34, h: 46,
-        finalX: 38, finalY: 0,
-        finalRotate: 6,
-        overshootX: 40, overshootY: -2,
-        overshootRotate: 10,
-        startX: 20, startY: -80,
-        startRotate: 20,
-        z: 5,
-        delay: 90
-      },
-      {
-        w: 32, h: 40,
-        finalX: 68, finalY: 8,
-        finalRotate: -3,
-        overshootX: 70, overshootY: 6,
-        overshootRotate: -6,
-        startX: 110, startY: -30,
-        startRotate: 16,
-        z: 3,
-        delay: 160
-      },
-      {
-        w: 38, h: 42,
-        finalX: 18, finalY: 40,
-        finalRotate: 5,
-        overshootX: 16, overshootY: 38,
-        overshootRotate: 8,
-        startX: -65, startY: 20,
-        startRotate: -16,
-        z: 6,
-        delay: 220
-      },
-      {
-        w: 34, h: 50,
-        finalX: 58, finalY: 42,
-        finalRotate: -7,
-        overshootX: 60, overshootY: 40,
-        overshootRotate: -11,
-        startX: 85, startY: 100,
-        startRotate: 22,
-        z: 4,
-        delay: 290
-      },
-      {
-        w: 48, h: 34,
-        finalX: 0, finalY: 66,
-        finalRotate: 3,
-        overshootX: -2, overshootY: 64,
-        overshootRotate: 6,
-        startX: -60, startY: 110,
-        startRotate: -12,
-        z: 1,
-        delay: 360
-      },
-      {
-  w: 22, h: 28,              // smaller so it doesn’t dominate
-  finalX: 78, finalY: 70,    // bottom-right corner
-  finalRotate: 3,
+        width: 35vw;
+        padding: 30px 40px;
 
-  overshootX: 80, overshootY: 68,
-  overshootRotate: 6,
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
 
-  startX: 120, startY: 120,  // comes from bottom-right
-  startRotate: 15,
+        color: #111;
+        text-align: center;
 
-  z: 5,                      // LOWER z-index so it sits behind others
-  delay: 130
-}
-    ];
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+        z-index: 100;
+      }
 
-    photos.forEach((photo, i) => {
-      const item = layout[i];
+      .center-text h1 {
+        margin: 0 0 10px;
+        font-size: 3vw;
+      }
 
-      photo.style.width = item.w + "vw";
-      photo.style.height = item.h + "vh";
-      photo.style.zIndex = item.z;
+      .center-text p {
+        margin: 0;
+        font-size: 1.3vw;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <img class="photo" src="1913 Cheltenham annual report 2026-02-07 16.12.36.jpg" alt="Photo 1" />
+      <img class="photo" src="13248.jpg" alt="Photo 2" />
+      <img class="photo" src="1913 Cheltenham annual report.jpg" alt="Photo 3" />
+      <img class="photo" src="LH-070-2-13-04-resized-1200x953.jpg" alt="Photo 4" />
+      <img class="photo" src="3e16f3434dd9c3d677a13092d894328f.jpg" alt="Photo 5" />
+      <img
+        class="photo"
+        src="Negro-Boys-Industrial-Fire.-Photo-of-Boys-Equal-Justice-Initiative-300x300.jpg"
+        alt="Photo 6" />
+      <img class="photo" src="LH_070_2_13_12-Resized.jpg" alt="Photo 7" />
+      <div class="center-text">
+        <h1>Mortality in America’s historical reformatories and industrial schools</h1>
+        <p>
+          Across Top: House of Reformation and Instruction for Colored Children, State School for Girls, House of
+          Reformation and Instruction for Colored Children Across Bottom: Negro Boys Industrial School, Lyman School for
+          Boys, State Industrial Home for Girls, Lyman School for Boys
+        </p>
+      </div>
+    </div>
 
-      photo.style.setProperty("--final-x", item.finalX + "vw");
-      photo.style.setProperty("--final-y", item.finalY + "vh");
-      photo.style.setProperty("--final-rotate", item.finalRotate + "deg");
+    <script>
+      const photos = document.querySelectorAll(".photo");
 
-      photo.style.setProperty("--overshoot-x", item.overshootX + "vw");
-      photo.style.setProperty("--overshoot-y", item.overshootY + "vh");
-      photo.style.setProperty("--overshoot-rotate", item.overshootRotate + "deg");
+      const layout = [
+        {
+          w: 42,
+          h: 52,
+          finalX: 0,
+          finalY: 0,
+          finalRotate: -4,
+          overshootX: -2,
+          overshootY: -2,
+          overshootRotate: -7,
+          startX: -70,
+          startY: -60,
+          startRotate: -18,
+          z: 2,
+          delay: 0
+        },
+        {
+          w: 34,
+          h: 46,
+          finalX: 38,
+          finalY: 0,
+          finalRotate: 6,
+          overshootX: 40,
+          overshootY: -2,
+          overshootRotate: 10,
+          startX: 20,
+          startY: -80,
+          startRotate: 20,
+          z: 5,
+          delay: 90
+        },
+        {
+          w: 32,
+          h: 40,
+          finalX: 68,
+          finalY: 8,
+          finalRotate: -3,
+          overshootX: 70,
+          overshootY: 6,
+          overshootRotate: -6,
+          startX: 110,
+          startY: -30,
+          startRotate: 16,
+          z: 3,
+          delay: 160
+        },
+        {
+          w: 38,
+          h: 42,
+          finalX: 18,
+          finalY: 40,
+          finalRotate: 5,
+          overshootX: 16,
+          overshootY: 38,
+          overshootRotate: 8,
+          startX: -65,
+          startY: 20,
+          startRotate: -16,
+          z: 6,
+          delay: 220
+        },
+        {
+          w: 34,
+          h: 50,
+          finalX: 58,
+          finalY: 42,
+          finalRotate: -7,
+          overshootX: 60,
+          overshootY: 40,
+          overshootRotate: -11,
+          startX: 85,
+          startY: 100,
+          startRotate: 22,
+          z: 4,
+          delay: 290
+        },
+        {
+          w: 48,
+          h: 34,
+          finalX: 0,
+          finalY: 66,
+          finalRotate: 3,
+          overshootX: -2,
+          overshootY: 64,
+          overshootRotate: 6,
+          startX: -60,
+          startY: 110,
+          startRotate: -12,
+          z: 1,
+          delay: 360
+        },
+        {
+          w: 22,
+          h: 28, // smaller so it doesn’t dominate
+          finalX: 78,
+          finalY: 70, // bottom-right corner
+          finalRotate: 3,
 
-      photo.style.setProperty("--start-x", item.startX + "vw");
-      photo.style.setProperty("--start-y", item.startY + "vh");
-      photo.style.setProperty("--start-rotate", item.startRotate + "deg");
+          overshootX: 80,
+          overshootY: 68,
+          overshootRotate: 6,
 
-      setTimeout(() => {
-        photo.classList.add("animate");
-      }, item.delay);
-    });
-  </script>
-</body>
+          startX: 120,
+          startY: 120, // comes from bottom-right
+          startRotate: 15,
+
+          z: 5, // LOWER z-index so it sits behind others
+          delay: 130
+        }
+      ];
+
+      photos.forEach((photo, i) => {
+        const item = layout[i];
+
+        photo.style.width = item.w + "vw";
+        photo.style.height = item.h + "vh";
+        photo.style.zIndex = item.z;
+
+        photo.style.setProperty("--final-x", item.finalX + "vw");
+        photo.style.setProperty("--final-y", item.finalY + "vh");
+        photo.style.setProperty("--final-rotate", item.finalRotate + "deg");
+
+        photo.style.setProperty("--overshoot-x", item.overshootX + "vw");
+        photo.style.setProperty("--overshoot-y", item.overshootY + "vh");
+        photo.style.setProperty("--overshoot-rotate", item.overshootRotate + "deg");
+
+        photo.style.setProperty("--start-x", item.startX + "vw");
+        photo.style.setProperty("--start-y", item.startY + "vh");
+        photo.style.setProperty("--start-rotate", item.startRotate + "deg");
+
+        setTimeout(() => {
+          photo.classList.add("animate");
+        }, item.delay);
+      });
+    </script>
+  </body>
 </html>
