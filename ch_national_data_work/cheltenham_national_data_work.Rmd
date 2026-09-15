@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-### About this dataset: 
+### National Reformatory Death Tracker Data Dictionary:  
 
 #### Column Definitions: 
 - Facility Type - column that associates the facility with its type, each row only allows for one entry, so (one facility = one type), there is NO overlap 
@@ -26,7 +26,7 @@ output: html_document
     - Any necessary note/comment on the death count number will usually identify the source or any discrepancy in numbers between two different sources. Lastly, if there is a number discrepancy, there will be a brief explanation of why we chose one of the two numbers. 
     - On Find a Grave - If it says that the cemetery can hold a certain amount, but the memorial number is different or smaller, go with that number 
 - Cemetery 
-    - Yes: There is evidence via open-sources including Find a Grave, facility records, news articles and state or historical sites that support the burial of incarcerated youth at the institution and the existence of a physical cemetery connected to the institution. 
+    - Yes: There is evidence via open-sources including Find a Grave, facility records, news articles and state or historical sites that support the burial of incarcerated youth at the institution and the existence of a physical cemetery connected to the institution. Some locations were visited and verified by the investigative team. 
     - No: There has not yet been found evidence that supports the existence of a physical cemetery connected to the institution. It does not preclude a cemetery’s existence, but that evidence has not yet been found via a longer, exhaustive investigation. 
     - Rumored: Social media sites, blogs or other community-based sites have discussed a physical cemetery location. 
     - Possible: The existence of a cemetery is supported by evidence such as death records of incarcerated youth which list the institution as the burial ground, but visual, online evidence of the cemetery has not yet been found. It does not preclude a cemetery’s existence, but that evidence has not yet been found via a longer, exhaustive investigation. We distinguish possible vs. yes on the basis of one or more visual, online markers that point to the existence of a burial site (i.e. cinder blocks). 
@@ -67,13 +67,18 @@ library(ggplot2)
 library(tidygeocoder)
 ```
 
-
-
 ```{r}
 ### loading data 
 
-national_death_tracker <- read_csv("new_national_clean.csv") |> 
+national_death_tracker <- read_csv("national_reformatory_death_tracker.csv") |> 
   clean_names()
+
+```
+```{r}
+### deleting the row of all na values 
+
+national_death_tracker <- national_death_tracker |> 
+  slice(-92)
 ```
 
 
@@ -84,9 +89,6 @@ national_death_tracker$city_state <- gsub("([A-Za-z ]) ([A-Z]{2})$", "\\1, \\2",
 ```
 
 ```{r}
-library(dplyr)
-library(stringr)
-library(tidygeocoder)
 
 national_clean <- national_death_tracker |>
   mutate(
@@ -125,7 +127,7 @@ national_geo <- national_clean |>
 ```
 
 ```{r}
-national_geo_data <- national_death_tracker |> 
+national_geo_data <- national_clean |> 
   mutate(location = paste(city, state, sep = ", ")) |> 
   geocode(location, method = "osm", lat = latitude, long = longitude)
 ```
@@ -146,9 +148,6 @@ facility_type_count <- national_death_tracker |>
   arrange(desc(n))
 ```
 
-```{r}
-write.csv(facility_type_count, "facility_type_count.csv", row.names = FALSE)
-```
 
 ```{r}
 write.csv(national_clean, "national_clean.csv", row.names = FALSE)
@@ -227,7 +226,7 @@ ggplot(race_count, aes(x = "", y = n, fill = race)) +
   theme(legend.position = "right")
 ```
 
-##### We have 17 white facilities, 17 black facilities, 11 facilities with all races but segregated, and 10 facilities with both white and black races.
+##### We have 18 white facilities, 17 black facilities, 12 facilities with all races but segregated, 1 Pacific Islander facility, and 10 facilities with both white and black races.
 
 ##### Cemetery Count Breakdown
 ```{r}
@@ -250,7 +249,7 @@ ggplot(cemetery_count, aes(x = "", y = n, fill = cemetery)) +
   theme(legend.position = "right")
 ```
 
-#### We have 23 facilities with cemeteries, 62 without cemteries, and 6 to be possible. 
+#### We have 23 facilities with cemeteries, 62 without cemeteries, and 6 to be possible. 
 
 ##### State of Cemetery Breakdown 
 
@@ -276,7 +275,7 @@ ggplot(state_of_cemetery_breakdown, aes(x = "", y = n, fill = state_of_cemetery)
 
 ##### Out of the cemeteries breakdown, we have 16 cemeteries that are maintained and we have 2 that were abandoned. 
 
-##### Abandonded Cemeteries Death Count
+##### Abandoned Cemeteries Death Count
 
 ```{r}
 ## counting the number of deaths for abandoned cemeteries 
@@ -297,9 +296,9 @@ abandoned_cemteries <- national_death_tracker |>
 write.csv(abandoned_cemteries, "abandoned_cemeteries.csv", row.names = FALSE)
 ```
 
-- We have 2 abandoned (technical 1 since we arleady knew about Cheltenham) facilities
+- We have 2 abandoned (technical 1 since we already knew about Cheltenham facility
 - The facilities are the following: House of Reformation and Instruction for Colored Boys (Reformatory) and the VA Industrial School for Colored Girls (Industrial School)
-- These facilities were established to house juvenile Black boys (Cheletenham) and housed juvenile Black girls (VA Industrial)
+- These facilities were established to house juvenile Black boys (Cheltenham) and housed juvenile Black girls (VA Industrial)
 - They both had allegations of abuse and forced labor 
 - 1 out of two was reported on recently (Cheltenham whereas the VA Industrial School has not been reported on recently)
 - The death counts are the following:  243 = Cheltenham and VA Industrial = 0 
@@ -343,7 +342,7 @@ ggplot(abuse_allegations_count, aes(x = "", y = n, fill = allegations_of_abuse))
   theme(legend.position = "right")
 ```
 
-##### We have 50 facilities with allegations of abuse and 41 unknown with 1 being NA. 
+##### We have 50 facilities with allegations of abuse and 41 unknown.
 
 ```{r}
 ggplot(forced_labor_count, aes(x = "", y = n, fill = allegations_of_forced_labor)) +
@@ -359,7 +358,7 @@ ggplot(forced_labor_count, aes(x = "", y = n, fill = allegations_of_forced_labor
   theme(legend.position = "right")
 ```
 
-##### We have 20 facilities with allegations of forced labor, 71 unknown, and 1 with NA 
+##### We have 20 facilities with allegations of forced labor and 71 unknown.
 
 
 ##### Death Count Total 
@@ -376,24 +375,25 @@ looking_at_death_counts <- national_death_tracker |>
   select(deaths_na, deaths_clean, death_qualifiers)
 ```
 
-#####  So looks like we have a total of 998 deaths across all of these reformatories, correctional facilities, and industrial schools. 
+#####  So looks like we have a total of 1016 deaths across all of these reformatories, correctional facilities, and industrial schools. 
 
 
 - Findings:
   - We have 52 reformatories, 36 industrial schools, and 3 correctional facilities in our dataset. 
   -  We have 40 boys facilities, 30 girls facilities, and 21 both genders facilities.
-  -  We have 17 white facilities, 17 black facilities, 11 facilities with all races but segregated, and 10 facilities with both white and black races.
-  - We have 23 facilities with cemeteries, 62 without cemteries, and 6 to be possible. 
+  - We have 18 white facilities, 17 black facilities, 12 facilities with all races but segregated, 1 Pacific Islander facility, and 10 facilities with both white and black races.
+  - We have 23 facilities with cemeteries, 62 without cemeteries, and 6 to be possible. 
   -  Out of the cemeteries breakdown, we have 16 cemeteries that are maintained and we have 2 that were abandoned.
   - We have 2 abandoned (technical 1 since we arleady knew about Cheltenham) facilities
     - The facilities are the following: House of Reformation and Instruction and the VA Industrial School for Colored Girls
-  - - These facilities were established to house juvenile Black boys (Cheletenham) and housed juvenile Black girls (VA Industrial)
+  - - These facilities were established to house juvenile Black boys (Cheltenham) and housed juvenile Black girls (VA Industrial)
 - They both had allegations of abuse and forced labor 
 - 1 out of two was reported on recently (Cheltenham whereas the VA Industrial School has not been reported on recently)
 - The death counts are the following:  243 = Cheltenham and VA Industrial = 0
 - Most of our data has not been reported on recently (66), we are looking at whether it was reported on in the last five years. 
--  We have 50 facilities with allegations of abuse and 41 unknown with 1 being NA. 
-- It looks like we have a total of 998 deaths across all of these reformatories, correctional facilities, and industrial schools. 
+-  We have 50 facilities with allegations of abuse and 41 unknown. 
+-  We have 20 facilities with allegations of forced labor and 71 unknown.
+- It looks like we have a total of 1016 deaths across all of these reformatories, correctional facilities, and industrial schools. 
 
   
   
