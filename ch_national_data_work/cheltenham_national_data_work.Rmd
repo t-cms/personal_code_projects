@@ -133,6 +133,16 @@ national_geo_data <- national_clean |>
 ```
 
 ```{r}
+## manually adding coordiantes for State Training School (Plankinton, South Dakota) and Industrial Home for Colored Girls (Melvale, Maryland), for some reason my previous code didn't recognize them to put the coordinates 
+
+national_geo_data <- national_geo_data |> 
+  mutate(latitude = ifelse(name_of_facility == "State Training School", 43.71479, latitude),
+         longitude = ifelse(name_of_facility == "State Training School", -98.48445, longitude),
+         latitude = ifelse(name_of_facility == "Industrial Home for Colored Girls", 39.34594, latitude),
+         longitude = ifelse(name_of_facility == "Industrial Home for Colored Girls", -76.64969, longitude))
+```
+
+```{r}
 ### cleaning up deaths column 
 national_death_tracker <- national_death_tracker |> 
   mutate(deaths_clean = str_extract(deaths_na, "\\d+"),
@@ -169,7 +179,7 @@ ggplot(facility_type_count, aes(x = "", y = n, fill = facility_type)) +
   theme(legend.position = "right")
 ```
 
-##### We have 52 reformatories, 36 industrial schools, and 3 correctional facilities in our dataset. 
+##### We have 52 reformatories, 36 industrial schools, and 2 correctional facilities in our dataset. 
 
 ##### Gender Count Breakdown 
 
@@ -202,7 +212,7 @@ gender_count <- national_death_tracker |>
   theme(legend.position = "right")
 ```
 
-##### We have 40 boys facilities, 30 girls facilities, and 21 both genders facilities.
+##### We have 40 boys facilities, 29 girls facilities, and 21 both genders facilities.
 
 ##### Race Count Breakdown 
 
@@ -226,7 +236,7 @@ ggplot(race_count, aes(x = "", y = n, fill = race)) +
   theme(legend.position = "right")
 ```
 
-##### We have 18 white facilities, 17 black facilities, 12 facilities with all races but segregated, 1 Pacific Islander facility, and 10 facilities with both white and black races.
+##### We have 18 white facilities, 16 black facilities, 12 facilities with all races but segregated, 1 Pacific Islander facility, and 10 facilities with both white and black races.
 
 ##### Cemetery Count Breakdown
 ```{r}
@@ -249,7 +259,7 @@ ggplot(cemetery_count, aes(x = "", y = n, fill = cemetery)) +
   theme(legend.position = "right")
 ```
 
-#### We have 23 facilities with cemeteries, 62 without cemeteries, and 6 to be possible. 
+#### We have 23 facilities with cemeteries, 61 without cemeteries, and 6 to be possible. 
 
 ##### State of Cemetery Breakdown 
 
@@ -314,7 +324,7 @@ reported_recently_count
 ```
 
 
-##### Most of our data has not been reported on recently (66), we are looking at whether it was reported on in the last five years. 
+##### Most of our data has not been reported on recently (65), we are looking at whether it was reported on in the last five years. 
 
 ##### Abuse/Forced Allegations Breakdown 
 
@@ -342,7 +352,7 @@ ggplot(abuse_allegations_count, aes(x = "", y = n, fill = allegations_of_abuse))
   theme(legend.position = "right")
 ```
 
-##### We have 50 facilities with allegations of abuse and 41 unknown.
+##### We have 51 facilities with allegations of abuse and 39 unknown.
 
 ```{r}
 ggplot(forced_labor_count, aes(x = "", y = n, fill = allegations_of_forced_labor)) +
@@ -358,10 +368,11 @@ ggplot(forced_labor_count, aes(x = "", y = n, fill = allegations_of_forced_labor
   theme(legend.position = "right")
 ```
 
-##### We have 20 facilities with allegations of forced labor and 71 unknown.
+##### We have 21 facilities with allegations of forced labor and 69 unknown.
 
 
 ##### Death Count Total 
+
 ```{r}
 national_death_tracker <- national_death_tracker |> 
   mutate(deaths_clean = str_extract(deaths_na, "\\d+"),
@@ -375,26 +386,52 @@ looking_at_death_counts <- national_death_tracker |>
   select(deaths_na, deaths_clean, death_qualifiers)
 ```
 
-#####  So looks like we have a total of 1016 deaths across all of these reformatories, correctional facilities, and industrial schools. 
+#####  So looks like we have a total of 1248 deaths across all of these reformatories, correctional facilities, and industrial schools. 
 
+#### Top 10 institutions by death
+
+```{r}
+top_10 <- national_death_tracker |> 
+    slice_max(order_by = deaths_clean, n=10) |> 
+  select(name_of_facility, deaths_clean)
+```
+
+```{r}
+## creating top ten chart 
+ggplot(top_10, aes(x = reorder(name_of_facility, deaths_clean), y = deaths_clean)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Top 10 Institutions by Death Count", x = "Institution Name", y = "Death Count") +
+  theme_minimal()
+```
+
+#### Top 10 as a pct of whole
+
+```{r}
+#82% of the deaths come from the top 10 institutions
+top_10 |> 
+ summarize(prop = sum(deaths_clean, na.rm = TRUE) / 1247)
+
+```
+##### The top ten institutions make up 81.5% of the deaths in the dataset.
 
 - Findings:
-  - We have 52 reformatories, 36 industrial schools, and 3 correctional facilities in our dataset. 
-  -  We have 40 boys facilities, 30 girls facilities, and 21 both genders facilities.
-  - We have 18 white facilities, 17 black facilities, 12 facilities with all races but segregated, 1 Pacific Islander facility, and 10 facilities with both white and black races.
-  - We have 23 facilities with cemeteries, 62 without cemeteries, and 6 to be possible. 
+  - We have 52 reformatories, 36 industrial schools, and 2 correctional facilities in our dataset. 
+  -  We have 40 boys facilities, 29 girls facilities, and 21 both genders facilities.
+  - We have 18 white facilities, 16 black facilities, 12 facilities with all races but segregated, 1 Pacific Islander facility, and 10 facilities with both white and black races.
+  - We have 23 facilities with cemeteries, 61 without cemeteries, and 6 to be possible. 
   -  Out of the cemeteries breakdown, we have 16 cemeteries that are maintained and we have 2 that were abandoned.
-  - We have 2 abandoned (technical 1 since we arleady knew about Cheltenham) facilities
+  - We have 2 abandoned (technical 1 since we already knew about Cheltenham) facilities
     - The facilities are the following: House of Reformation and Instruction and the VA Industrial School for Colored Girls
-  - - These facilities were established to house juvenile Black boys (Cheltenham) and housed juvenile Black girls (VA Industrial)
-- They both had allegations of abuse and forced labor 
-- 1 out of two was reported on recently (Cheltenham whereas the VA Industrial School has not been reported on recently)
-- The death counts are the following:  243 = Cheltenham and VA Industrial = 0
-- Most of our data has not been reported on recently (66), we are looking at whether it was reported on in the last five years. 
--  We have 50 facilities with allegations of abuse and 41 unknown. 
--  We have 20 facilities with allegations of forced labor and 71 unknown.
-- It looks like we have a total of 1016 deaths across all of these reformatories, correctional facilities, and industrial schools. 
-
+    - These facilities were established to house juvenile Black boys (Cheltenham) and housed juvenile Black girls (VA Industrial)
+    - They both had allegations of abuse and forced labor 
+    - 1 out of two was reported on recently (Cheltenham whereas the VA Industrial School has not been reported on recently)
+    - The death counts are the following:  243 = Cheltenham and VA Industrial = 0
+- Most of our data has not been reported on recently (65), we are looking at whether it was reported on in the last five years. 
+-  We have 51 facilities with allegations of abuse and 39 unknown.
+-  We have 21 facilities with allegations of forced labor and 69 unknown.
+- It looks like we have a total of 1248 deaths across all of these reformatories, correctional facilities, and industrial schools. 
+- The top ten institutions make up 81.5% of the deaths in the dataset.
   
   
   
