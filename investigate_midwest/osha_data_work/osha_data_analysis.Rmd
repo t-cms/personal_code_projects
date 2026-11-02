@@ -124,6 +124,7 @@ ggplot(osha_yearly, aes(x = factor(year), y = total_inspections)) +
   scale_y_continuous(labels = scales::comma) +
   theme_minimal()
 ```
+
 - So far, the data shows that the number of OSHA inspections has fluctuated over the years, with a peak in 2023 (76,283) and a decline in subsequent years. The total number of inspections in 2020 was 52,944, which increased to 61,266 in 2021, then decreased to 60,187 in 2022, and further declined to 75,920 in 2024 and 69,988 in 2025.The trend indicates a need for further investigation into the factors contributing to these changes in inspection numbers.
 
 
@@ -165,6 +166,7 @@ ggplot(inspection_by_type,
   ) +
   theme_minimal()
 ```
+
 - The line graph illustrates the trends in OSHA inspections by type from 2020 to 2025. It shows that the most type of inspections are "Planned", followed by "Complaint" and "Referral". The number of "Planned","Complaint" and "Referral" inspections have shown some fluctuations with each one increasing from 2022 - 2023. This suggests that the majority of OSHA inspections are planned, with a smaller proportion being initiated by complaints or referrals. Further analysis could explore the reasons behind these trends and their implications for workplace safety.
 
 ```{r}
@@ -212,6 +214,7 @@ ggplot(top_states_yearly,
     plot.title = element_text(face = "bold")
   )
 ```
+
 - California has the larged number of inspections for years 2020 - 2025. California and Washington consistently account for substantial inspection volumes compared with other states.
 Several states, including Michigan and Texas, maintain relatively consistent positions among the top five.The composition of the top five changed over time, with Oregon and New York appearing in later years. California's increase in 2025 warrants further examination to determine whether it reflects changes in OSHA enforcement activity, inspection priorities, or other factors.
 
@@ -295,7 +298,7 @@ top_establishments_year
 - Major shipping and logistics companies appeared in the rankings, including UPS in 2022 (44 inspections) and FedEx in 2025 (40 inspections).
 
 
-##### Story Idea 
+##### Story Ideas 
 - Repeat inspections and employer accountability: My preliminary findings show establishments appearing repeatedly in the annual rankings. The next question is whether those employers have recurring safety violations, and whether OSHA's enforcement actions have actually improved workplace conditions.
 - Geographic disparities in OSHA enforcement: Compare inspection rates against workforce and establishment counts to determine whether some states receive disproportionately less enforcement attention. This could reveal differences in how workplace safety is monitored across the country.
 
