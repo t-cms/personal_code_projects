@@ -160,7 +160,7 @@ facility_type_count <- national_death_tracker |>
 
 
 ```{r}
-write.csv(national_clean, "national_clean.csv", row.names = FALSE)
+write.csv(national_geo_data, "national_geo_data.csv", row.names = FALSE)
 ```
 
 

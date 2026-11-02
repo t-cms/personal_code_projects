@@ -1,0 +1,309 @@
+---
+title: "Investigative Midwest's OSHA Data Analysis"
+author: "Tiasia Saunders"
+date: "`r Sys.Date()`"
+output: html_document
+---
+#### Preliminary Analysis 
+
+##### Agency Information: 
+- Occupational Safety and Health Administration (OSHA) is to assure safe and healthful working conditions for American workers by setting and enforcing standards, and by providing training, outreach, education, and assistance
+
+##### OSHA Data:  
+  - OSHA Inspection: This dataset provides the inspection case detail for OSHA inspections. The dataset includes information about why the inspection was conducted.
+
+  
+```{r}
+## loading libraries 
+library(tidyverse)
+library(dplyr)
+library(stringr)
+library(knitr)
+library(readxl)
+library(janitor)
+library(lubridate)
+library(ggplot2)
+library(tidygeocoder)
+library(httr2)
+library(jsonlite)
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(readr)
+```
+
+```{r echo=TRUE}
+osha_inspection_1 <- read_csv("osha_inspection/2026-11-01_chunk_1.csv") |> 
+  clean_names()
+
+osha_inspection_2 <- read_csv("osha_inspection/2026-11-01_chunk_2.csv") |> 
+  clean_names()
+
+osha_inspection_3 <- read_csv("osha_inspection/2026-11-01_chunk_3.csv") |> 
+  clean_names()
+
+osha_inspection_4 <- read_csv("osha_inspection/2026-11-01_chunk_4.csv") |> 
+  clean_names()
+
+osha_inspection_5 <- read_csv("osha_inspection/2026-11-01_chunk_5.csv") |> 
+  clean_names()
+
+osha_inspection_6 <- read_csv("osha_inspection/2026-11-01_chunk_6.csv") |> 
+  clean_names()
+```
+
+
+```{r}
+osha_inspection_1$open_date <- as.Date(osha_inspection_1$open_date)
+osha_inspection_2$open_date <- as.Date(osha_inspection_2$open_date)
+osha_inspection_3$open_date <- as.Date(osha_inspection_3$open_date)
+osha_inspection_4$open_date <- as.Date(osha_inspection_4$open_date)
+osha_inspection_5$open_date <- as.Date(osha_inspection_5$open_date)
+osha_inspection_6$open_date <- as.Date(osha_inspection_6$open_date)
+```
+
+```{r}
+range(osha_inspection_1$open_date)
+range(osha_inspection_2$open_date)
+range(osha_inspection_3$open_date)
+range(osha_inspection_4$open_date)
+range(osha_inspection_5$open_date)
+range(osha_inspection_6$open_date)
+
+```
+```{r}
+osha_inspection_5 <- osha_inspection_5 %>%
+  mutate(owner_code = as.character(owner_code)) |> 
+  mutate(sic_code = as.character(sic_code)) |> 
+  mutate(naics_code = as.numeric(naics_code)) |> 
+  mutate(case_mod_date = as.Date(case_mod_date)) 
+
+osha_inspection_6 <- osha_inspection_6 %>%
+  mutate(owner_code = as.character(owner_code)) |> 
+  mutate(sic_code = as.character(sic_code)) |> 
+   mutate(case_mod_date = as.Date(case_mod_date)) 
+```
+
+```{r}
+osha_inspection <- bind_rows(
+  osha_inspection_5,
+  osha_inspection_6
+)
+```
+
+```{r}
+## limiting to last 5 years 
+osha_inspection <- osha_inspection %>%
+  filter(open_date >= as.Date("2020-01-01"),
+         open_date <= as.Date("2025-12-31"))
+
+```
+
+
+```{r}
+osha_yearly <- osha_inspection %>%
+  mutate(year = year(open_date)) %>%
+  count(year, name = "total_inspections") %>%
+  arrange(year)
+
+print(osha_yearly)
+```
+```{r}
+ggplot(osha_yearly, aes(x = factor(year), y = total_inspections)) +
+  geom_col(fill = "lavender") +
+  geom_text(
+    aes(label = scales::comma(total_inspections)),
+    vjust = -0.5,
+    size = 3.5
+  ) +
+  labs(
+    title = "Annual OSHA Inspections, 2020–2025",
+    x = "Year",
+    y = "Total Inspections"
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal()
+```
+- So far, the data shows that the number of OSHA inspections has fluctuated over the years, with a peak in 2023 (76,283) and a decline in subsequent years. The total number of inspections in 2020 was 52,944, which increased to 61,266 in 2021, then decreased to 60,187 in 2022, and further declined to 75,920 in 2024 and 69,988 in 2025.The trend indicates a need for further investigation into the factors contributing to these changes in inspection numbers.
+
+
+```{r}
+osha_yearly <- osha_yearly %>%
+  arrange(year) %>%
+  mutate(
+    previous_year = lag(total_inspections),
+    change = total_inspections - previous_year,
+    pct_change = (change / previous_year) * 100
+  )
+
+osha_yearly
+```
+
+```{r}
+inspection_types <- osha_inspection %>%
+  count(insp_type, sort = TRUE)
+
+inspection_types
+```
+
+```{r}
+inspection_by_type <- osha_inspection %>%
+  mutate(year = lubridate::year(open_date)) %>%
+  count(year, insp_type)
+
+ggplot(inspection_by_type,
+       aes(x = year, y = n, color = insp_type)) +
+  geom_line(linewidth = 1) +
+  geom_point() +
+  scale_x_continuous(breaks = 2020:2025) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "OSHA Inspection Trends by Type",
+    x = "Year",
+    y = "Inspections",
+    color = "Inspection type"
+  ) +
+  theme_minimal()
+```
+- The line graph illustrates the trends in OSHA inspections by type from 2020 to 2025. It shows that the most type of inspections are "Planned", followed by "Complaint" and "Referral". The number of "Planned","Complaint" and "Referral" inspections have shown some fluctuations with each one increasing from 2022 - 2023. This suggests that the majority of OSHA inspections are planned, with a smaller proportion being initiated by complaints or referrals. Further analysis could explore the reasons behind these trends and their implications for workplace safety.
+
+```{r}
+state_inspections <- osha_inspection %>%
+  count(site_state, sort = TRUE)
+```
+
+
+```{r}
+top_states_yearly <- osha_inspection %>%
+  mutate(year = lubridate::year(open_date)) %>%
+  group_by(year, site_state) %>%
+  summarise(
+    total_inspections = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(year) %>%
+  slice_max(
+    order_by = total_inspections,
+    n = 5,
+    with_ties = FALSE
+  ) %>%
+  arrange(year, desc(total_inspections))
+
+top_states_yearly
+```
+
+```{r}
+ggplot(top_states_yearly,
+       aes(x = reorder(site_state, total_inspections),
+           y = total_inspections)) +
+  geom_col(fill = "#345B73") +
+  coord_flip() +
+  facet_wrap(~year, scales = "free_y") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Top Five States for OSHA Inspections",
+    subtitle = "Annual rankings, 2020–2025",
+    x = "State",
+    y = "Number of Inspections"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(face = "bold")
+  )
+```
+- California has the larged number of inspections for years 2020 - 2025. California and Washington consistently account for substantial inspection volumes compared with other states.
+Several states, including Michigan and Texas, maintain relatively consistent positions among the top five.The composition of the top five changed over time, with Oregon and New York appearing in later years. California's increase in 2025 warrants further examination to determine whether it reflects changes in OSHA enforcement activity, inspection priorities, or other factors.
+
+
+```{r}
+osha_state_year <- osha_inspection %>%
+  mutate(
+    year = lubridate::year(open_date),
+    site_state = str_to_upper(str_trim(site_state)),
+    estab_name = str_to_upper(str_trim(estab_name))
+  ) %>%
+  filter(!is.na(site_state)) %>%
+  group_by(year, site_state) %>%
+  summarise(
+    total_inspections = n(),
+    unique_establishments = n_distinct(
+      estab_name[!is.na(estab_name) & estab_name != ""]
+    ),
+    .groups = "drop"
+  ) %>%
+  group_by(year) %>%
+  slice_max(
+    order_by = unique_establishments,
+    n = 5,
+    with_ties = FALSE
+  ) %>%
+  arrange(year, desc(unique_establishments)) %>%
+  ungroup()
+
+osha_state_year
+```
+
+```{r}
+top_establishments_state_year <- osha_inspection %>%
+  mutate(
+    year = lubridate::year(open_date),
+    estab_name = str_to_upper(str_trim(estab_name)),
+    site_state = str_to_upper(str_trim(site_state))
+  ) %>%
+  filter(!is.na(estab_name), estab_name != "") %>%
+  group_by(year, estab_name, site_state) %>%
+  summarise(
+    total_inspections = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(year) %>%
+  slice_max(total_inspections, n = 5, with_ties = FALSE) %>%
+  arrange(year, desc(total_inspections)) %>%
+  ungroup()
+```
+- Puerto Rico repeatedly appeared among the top five, with the establishment listed as DE ranking every year from 2021–2025 and reaching 68 inspections in 2024.
+- Some establishments appeared in the rankings across multiple years, including AEP in Puerto Rico (2023–2025) and UNKNOWN/INVALID ESTABLISHMENT in Pennsylvania and Rhode Island (2022–2025).
+- Government and public-sector entities were also prominent, including Connecticut municipalities, the U.S. Postal Service, Alaska DOT&PF and the Virgin Islands Department of Education.
+
+
+```{r}
+top_establishments_year <- osha_inspection %>%
+  mutate(
+    year = lubridate::year(open_date),
+    estab_name = str_to_upper(str_trim(estab_name))
+  ) %>%
+  filter(!is.na(estab_name), estab_name != "") %>%
+  group_by(year, estab_name) %>%
+  summarise(
+    total_inspections = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(year) %>%
+  slice_max(
+    order_by = total_inspections,
+    n = 5,
+    with_ties = FALSE
+  ) %>%
+  arrange(year, desc(total_inspections)) %>%
+  ungroup()
+
+top_establishments_year
+```
+- The U.S. Postal Service consistently ranked among the most frequently inspected establishments from 2020–2025, reaching a peak of 145 inspections in 2024 before declining to 72 in 2025.
+- Establishments with missing or invalid names appeared repeatedly among the top five each year, raising questions about the completeness and consistency of OSHA's employer records.
+- Major shipping and logistics companies appeared in the rankings, including UPS in 2022 (44 inspections) and FedEx in 2025 (40 inspections).
+
+
+##### Story Idea 
+- Repeat inspections and employer accountability: My preliminary findings show establishments appearing repeatedly in the annual rankings. The next question is whether those employers have recurring safety violations, and whether OSHA's enforcement actions have actually improved workplace conditions.
+- Geographic disparities in OSHA enforcement: Compare inspection rates against workforce and establishment counts to determine whether some states receive disproportionately less enforcement attention. This could reveal differences in how workplace safety is monitored across the country.
+
+
+#### Next Steps 
+1. Connect inspections to violations. Determine which inspections resulted in citations and identify the severity of those violations.
+2. Build an employer-level dataset. Identify employers with repeat inspections, repeat violations and substantial penalties.
+3. Calculate inspection rates. Compare inspection activity against state employment and establishment counts.
+4. Bring in workplace injury and fatality data. Look for discrepancies between workplace risk and OSHA enforcement.
+5. Select a reporting focus. Use the findings to identify a specific employer, industry, state or enforcement gap for deeper investigation.
+
