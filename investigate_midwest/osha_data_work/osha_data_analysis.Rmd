@@ -32,7 +32,7 @@ library(lubridate)
 library(readr)
 ```
 
-```{r echo=TRUE}
+```{r}
 osha_inspection_1 <- read_csv("osha_inspection/2026-11-01_chunk_1.csv") |> 
   clean_names()
 
@@ -63,6 +63,7 @@ osha_inspection_6$open_date <- as.Date(osha_inspection_6$open_date)
 ```
 
 ```{r}
+## getting all the ranges so I can get the min and max dates for the entire dataset
 range(osha_inspection_1$open_date)
 range(osha_inspection_2$open_date)
 range(osha_inspection_3$open_date)
@@ -72,6 +73,12 @@ range(osha_inspection_6$open_date)
 
 ```
 ```{r}
+osha_inspection_4 <- osha_inspection_4 %>%
+  mutate(owner_code = as.character(owner_code)) |> 
+  mutate(sic_code = as.character(sic_code)) |> 
+  mutate(naics_code = as.numeric(naics_code)) |> 
+   mutate(case_mod_date = as.Date(case_mod_date)) 
+
 osha_inspection_5 <- osha_inspection_5 %>%
   mutate(owner_code = as.character(owner_code)) |> 
   mutate(sic_code = as.character(sic_code)) |> 
@@ -85,7 +92,9 @@ osha_inspection_6 <- osha_inspection_6 %>%
 ```
 
 ```{r}
+## joining the data tha contains years 2020 - 2025
 osha_inspection <- bind_rows(
+  osha_inspection_4, 
   osha_inspection_5,
   osha_inspection_6
 )
@@ -125,7 +134,7 @@ ggplot(osha_yearly, aes(x = factor(year), y = total_inspections)) +
   theme_minimal()
 ```
 
-- So far, the data shows that the number of OSHA inspections has fluctuated over the years, with a peak in 2023 (76,283) and a decline in subsequent years. The total number of inspections in 2020 was 52,944, which increased to 61,266 in 2021, then decreased to 60,187 in 2022, and further declined to 75,920 in 2024 and 69,988 in 2025.The trend indicates a need for further investigation into the factors contributing to these changes in inspection numbers.
+- So far, the data shows that the number of OSHA inspections has fluctuated over the years, with a peak in 2023 (76,283) and a decline in subsequent years. The total number of inspections in 2020 was 52,944, which increased to 61,297 in 2021, and continued to increase to 69,524 in 2022, and further declined to 75,930 in 2024 and 69,988 in 2025.The trend indicates a need for further investigation into the factors contributing to these changes in inspection numbers.
 
 
 ```{r}
@@ -167,7 +176,7 @@ ggplot(inspection_by_type,
   theme_minimal()
 ```
 
-- The line graph illustrates the trends in OSHA inspections by type from 2020 to 2025. It shows that the most type of inspections are "Planned", followed by "Complaint" and "Referral". The number of "Planned","Complaint" and "Referral" inspections have shown some fluctuations with each one increasing from 2022 - 2023. This suggests that the majority of OSHA inspections are planned, with a smaller proportion being initiated by complaints or referrals. Further analysis could explore the reasons behind these trends and their implications for workplace safety.
+- The line graph illustrates the trends in OSHA inspections by type from 2020 to 2025. It shows that the most type of inspections are "Planned", followed by "Complaint" and "Referral". The number of "Planned","Complaint" and "Referral" inspections have shown some fluctuations with each one increasing from 2022 - 2023. Additionally, they all decrease from 2024 to 2025. This suggests that the majority of OSHA inspections are planned, with a smaller proportion being initiated by complaints or referrals. Further analysis could explore the reasons behind these trends and their implications for workplace safety.
 
 ```{r}
 state_inspections <- osha_inspection %>%
